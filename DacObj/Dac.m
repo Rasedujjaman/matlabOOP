@@ -1,8 +1,7 @@
 
 classdef Dac
     % The Dac class will be used to instantiate object for the dac to control the galvalo mirror 
-    %   Detailed explanation goes here
-    
+   
     
     
     
