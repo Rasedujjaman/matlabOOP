@@ -8,10 +8,16 @@ camZyla = Camera;
  
 %% set the ROI (select any one)
 % % camZyla.setROI(1776, 1760);
-% % camZyla.setROI(1392, 1040);
-camZyla.setROI(528, 512);
+camZyla.setROI(1392, 1040);
+% % camZyla.setROI(528, 512);
 
 %%
+%%%%%% Take the snapshot
+ figure, imagesc((camZyla.getImageFrame)'), colorbar
+
+
+%%
+%%%%%%Take multiple snapshot
 numIlluminaiton = 5;
 sleep_time = 0.00;
 
@@ -26,6 +32,7 @@ for ii = 1: numIlluminaiton
     pause(sleep_time); % sleep time to settle the galvano mirrors
 end
 toc
+
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%% Shut down camear

@@ -1,7 +1,9 @@
 
 
 classdef Camera < handle
-    %UNTITLED Summary of this class goes here
+    % Camera class is intended for use with AndorZyla camera
+   
+    
     %   Detailed explanation goes here
     
     properties (Access = private)
@@ -83,11 +85,15 @@ classdef Camera < handle
       
         
         
-        
-        %%% Set the ROI (region of interest)
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% Set the ROI (region of interest) 
+        %%% check the sdk guide for AndorZyla camera for the supported values of ROI
         
         function obj = setROI(obj, width, height)
-                
+            [rc] = AT_Command(obj.hndl,'AcquisitionStop');
+            AT_CheckWarning(rc);
+            
             if(width == 2560 && height == 2160)
                 obj.left = 1; 
                 obj.top = 1;
@@ -112,29 +118,57 @@ classdef Camera < handle
             else
                 disp('ROI not supported');
             
+            
+          
             end
             
             
             
-            %%% Set the ROI
+            %%% Set the ROI with new values
             
             [rc] = AT_SetInt(obj.hndl,'AOIWidth',width);
-%             AT_CheckWarning(rc);
+            AT_CheckWarning(rc);
             [rc] = AT_SetInt(obj.hndl,'AOILeft',obj.left);
-%             AT_CheckWarning(rc);
+            AT_CheckWarning(rc);
             [rc] = AT_SetInt(obj.hndl,'AOIHeight',height);
-%             AT_CheckWarning(rc);
+            AT_CheckWarning(rc);
             [rc] = AT_SetInt(obj.hndl,'AOITop',obj.top);
-%             AT_CheckWarning(rc);
-% %             [rc, obj.imagesize] = AT_GetInt(obj.hndl,'ImageSizeBytes'); 
-             % % Eech time you set ROI, you must update the image size                                                           
-                                                                                                                               
-% %             AT_CheckWarning(rc);
+            AT_CheckWarning(rc);                                                                                                          
+     
+           disp('ROI is set properly')
+           [rc] = AT_Command(obj.hndl,'AcquisitionStart');
+            AT_CheckWarning(rc);
             
+            %%%% Refresh all the paramerters related to the size of the image 
+            [rc,obj.imageSize] = AT_GetInt(obj.hndl,'ImageSizeBytes');
+            AT_CheckWarning(rc);
+            [rc,obj.height] = AT_GetInt(obj.hndl,'AOIHeight');
+            AT_CheckWarning(rc);
+            [rc,obj.width] = AT_GetInt(obj.hndl,'AOIWidth');
+            AT_CheckWarning(rc);
             
+            [rc,obj.top] = AT_GetInt(obj.hndl,'AOITop');
+            AT_CheckWarning(rc);
+            [rc,obj.left] = AT_GetInt(obj.hndl,'AOILeft');
+            AT_CheckWarning(rc);
+            
+            [rc,obj.stride] = AT_GetInt(obj.hndl,'AOIStride'); 
+            AT_CheckWarning(rc);   
             
         end
-
+        
+        %%% End of setROI function
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% Get the ROI of the camera
+         function stringROI = getROI(obj)
+            stringROI = [num2str(obj.width), ' X ', num2str(obj.height)];
+         end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        
         %%% This function will return the image size
         function outPutImageSize = getImageSize(obj)
             [rc, outPutImageSize] = AT_GetInt(obj.hndl,'ImageSizeBytes');
@@ -145,12 +179,13 @@ classdef Camera < handle
         %%% This function will return the image frame 
         
         function outImageFrame = getImageFrame(obj)
-% %             [rc,imagesize] = AT_GetInt(obj.hndl,'ImageSizeBytes');
-% %             AT_CheckWarning(rc);
-            [rc] = AT_QueueBuffer(obj.hndl, obj.imageSize);
-            AT_CheckWarning(rc);
+           
             [rc] = AT_Command(obj.hndl,'SoftwareTrigger');
             AT_CheckWarning(rc);
+            
+            [rc] = AT_QueueBuffer(obj.hndl, obj.imageSize);
+            AT_CheckWarning(rc);
+          
             
             [rc, buf] = AT_WaitBuffer(obj.hndl,1000);
             AT_CheckWarning(rc);
