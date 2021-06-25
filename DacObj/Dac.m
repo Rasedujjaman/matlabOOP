@@ -55,7 +55,7 @@ classdef Dac
         end
        
         
-        
+        %%
         %%% put the voltage to the output channel (this function is
         %%% overloaded 
         function putVoltage(obj, voltX, voltY)
@@ -68,7 +68,13 @@ classdef Dac
             end
         end
             
-        
+        %% Close the Dac 
+        function closeDevices(obj)
+            delete (obj.ao_device);  
+            clear  obj.ao_device          
+            disp('Dac object is deleted and cleared');
+            
+        end
         
     end
 end
