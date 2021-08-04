@@ -3,14 +3,46 @@ classdef camPcoPanda  < handle
     %   Detailed explanation goes here
     
      properties (Access = private)
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%% ROI parameters (see the description of ROI in the SKD of PCO camera)
+        
+        sensorWidthMax  = 2048;
+        sensorHeightMax = 2048;  
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%% These four values are initialized with default value
+         wRoiX0 = 1;       %% x position of top letf corner of the sensor
+         wRoiY0 = 1;       %% y position of top letf corner of the sensor
+         wRoiX1 = 2048;       %% x position of bottom right corner of the sensor 
+         wRoiY1 = 2048;      %% y position of bottom right corner of the sensor
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+       
+        %%%%%% These two parameters define the actual size of the acquired
+        %%%%%% image
+        sensorWidthActive       %% sensor width
+        sensorHeightActive      %% sensor height 
+      
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     
         exposure_time = 10;  %% exposure time (default value 10ms)
-        triggermode = 0;   %% default value
-        reduce_display_size = 1;
+        triggermode = 0;     %% default value
+        
+        
      end
      
      
      
      properties (Access = public)
+        % %% %    glvar :structure to hold status infos of the camera
+        %glvar.do_libunload: 1 unload lib at end
+        %glvar.do_close:     1 close camera SDK at end
+        %glvar.camera_open:  open status of camera SDK
+        %glvar.out_ptr:      libpointer to camera SDK handle
+        
         glvar=struct('do_libunload',0,'do_close',0,'camera_open',0,'out_ptr',[]); 
         out_ptr   %% the camera handle 
      end
@@ -21,13 +53,35 @@ classdef camPcoPanda  < handle
         function obj = camPcoPanda()
             %CAMPCOPANDA Construct an instance of this class
             %   Detailed explanation goes here
+            % % % When a object is instantiated by calling camPcoPanda()
+            %%%% All the necessary dll files and matlab script will be
+            %%%% loaded and a camera variable will be created that is
+            %%%% associated with the pco.panda camera.
+            %%%% Once the camra variable is created then all the methods 
+            %%%% associated with this camera object will be activated
+            %%%% 
+            %%%% Example code:
+            %%%% camPanda = camPcoPanda; %% Instantiate a camera object
+            %%%% camPanda.setROI(1024, 1024); %% set the ROI
+            
+            %%%% img = camPanda.getImageFrame();  %% will grab a single
+            %%%%  image
+            
+            %%%% camPanda.closeDevices(); %% device will be closed 
+            
+            
+            
+            
+            
             
             % % load all the necessary header, dll and functions
             addpath(fullfile(pwd,'/headerAndFunctionsPcoPanda/runtime/bin64/'));   
             addpath(fullfile(pwd,'/headerAndFunctionsPcoPanda/runtime/include/'));
             addpath(fullfile(pwd,'/headerAndFunctionsPcoPanda/runtime/lib64/'));  
 
-            addpath(fullfile(pwd,'/headerAndFunctionsPcoPanda/scripts/'));  
+            addpath(fullfile(pwd,'/headerAndFunctionsPcoPanda/scripts/'));  %% useful to use predefined functions
+                                                                             
+            
             addpath(fullfile(pwd,'/headerAndFunctionsPcoPanda/scripts/ver_8/')); 
             
             pco_camera_create_deffile();   %% run only onece 
@@ -111,7 +165,15 @@ classdef camPcoPanda  < handle
          obj = getImageFrame(obj);  %% function prototype for image capture
         
         
-        
+         
+         %%% Getting Region of interest (ROI)
+         obj = getROI(obj)
+         
+         %%% Setting the Region of interest (ROI)
+         obj = setROI(obj, width, height);   %% Function prototype for setting the ROI
+         
+         %%% Get the triggermode
+         obj = getTrigerMode(obj)
          
          %%% Function prototype for closing the devices
          closeDevices(obj);
