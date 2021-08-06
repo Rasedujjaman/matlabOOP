@@ -50,8 +50,8 @@ camZyla.setROI(1392, 1040);
 camPanda = DevicePack.camPcoPanda;
 
 %%
-camPanda.getExposureTime();
-camPanda.setExposureTime(5);
+% % camPanda.getExposureTime();
+% % camPanda.setExposureTime(5);
 img = camPanda.getImageFrame();  %% take a single image
 figure, imagesc(img)
 
@@ -67,3 +67,13 @@ toc
 
 %% Shut down the and unload the camera library
 camPanda.closeDevices();
+
+%% Test the photon focus camera
+cam = DevicePack.camPhotonFocus;
+
+%%
+cam.setExposureTime(20);
+figure, imagesc(cam.getImageFrame());
+
+%% Close the camera object
+cam.closeDevices();

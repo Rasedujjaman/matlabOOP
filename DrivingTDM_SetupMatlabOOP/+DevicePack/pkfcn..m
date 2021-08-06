@@ -92,3 +92,21 @@ obj.myMethod(arg);
 camPcoPanda.stMethod(arg);
 
 
+
+%%%% The camPhotonFocus class 
+classdef camPhotonFocus
+import DevicePack.*
+import DevicePack.camPhotonFocus.*
+
+% Call package function
+z = pkfcn(x,y);
+
+% Creation class object
+obj=camPhotonFocus(arg);
+
+% Call class object method
+obj.myMethod(arg);
+% Of the static method of the class
+camPhotonFocus.stMethod(arg);
+
+
