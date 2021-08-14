@@ -77,3 +77,20 @@ figure, imagesc(cam.getImageFrame());
 
 %% Close the camera object
 cam.closeDevices();
+
+
+
+
+%% Test the LASER source
+%% Instantiate the object LASER
+laser = DevicePack.NKTPLaser;
+
+%% Trun ON the laser
+laser.turnONdevice();
+
+%% Set the power level of the LASER
+laser.setPowerLevel(50);  %% set the power level to 50 percent
+
+%% Turn OFF the LASER
+laser.closeDevices();
+

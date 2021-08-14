@@ -110,3 +110,23 @@ obj.myMethod(arg);
 camPhotonFocus.stMethod(arg);
 
 
+
+
+
+%%%% The LASER source
+classdef NKTPLaser
+import DevicePack.*
+import DevicePack.NKTPLaser.*
+
+% Call package function
+z = pkfcn(x,y);
+
+% Creation class object
+obj=NKTPLaser(arg);
+
+% Call class object method
+obj.myMethod(arg);
+% Of the static method of the class
+NKTPLaser.stMethod(arg);
+
+
