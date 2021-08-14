@@ -15,14 +15,11 @@ function obj = setWavelength(obj, lambda)
             if (minLambda >= obj.minWavelength && maxLambda <= obj.maxWavelength)
             
                 [err1, y] = calllib('NKTPDLL', 'registerWriteU16',  obj.portName, obj.addressModuleTypeFilter,...
-                     obj.regID_SWP, floor(minLambda/10), -1); %% set the Short wave pass filter setpoint 
+                     obj.regID_SWP, minLambda*10, -1); %% set the Short wave pass filter setpoint 
                  
                  
                  [err2, y] = calllib('NKTPDLL', 'registerWriteU16',  obj.portName, obj.addressModuleTypeFilter,...
-                     obj.regID_LWP, floor(maxLambda/10), -1); %% set the Long wave pass filter setpoint
-                 
-                 [err3, y] = calllib('NKTPDLL', 'registerWriteU16',  obj.portName, obj.addressModuleTypeFilter,...
-                     50, 1, -1); %% set the Long wave pass filter setpoint
+                     obj.regID_LWP, maxLambda*10, -1); %% set the Long wave pass filter setpoint
                  
 
             else
@@ -32,7 +29,7 @@ function obj = setWavelength(obj, lambda)
                 
             
            
-            if (err1 == 0 && err2 == 0 && err3 == 0 )
+            if (err1 == 0 && err2 == 0)
                 disp('Wavelenght is set properly');
             end 
 end
