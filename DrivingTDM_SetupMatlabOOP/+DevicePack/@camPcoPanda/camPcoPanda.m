@@ -22,8 +22,8 @@ classdef camPcoPanda  < handle
        
         %%%%%% These two parameters define the actual size of the acquired
         %%%%%% image
-        sensorWidthActive       %% sensor width
-        sensorHeightActive      %% sensor height 
+        sensorWidthActive = 2048       %% sensor width (value is initialized with max)
+        sensorHeightActive = 2048     %% sensor height (value is initialized with max)
       
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,6 +45,7 @@ classdef camPcoPanda  < handle
         
         glvar=struct('do_libunload',0,'do_close',0,'camera_open',0,'out_ptr',[]); 
         out_ptr   %% the camera handle 
+        IsLiveON = 0;  
      end
      
      
@@ -168,6 +169,17 @@ classdef camPcoPanda  < handle
          
          %%% Getting Region of interest (ROI)
          obj = getROI(obj)
+         
+         %%% getting the image Frame width
+         obj = getImageWidth(obj);
+       
+        
+
+       %%% getting the image Frame height
+        obj = getImageHeight(obj);
+         
+         
+         
          
          %%% Setting the Region of interest (ROI)
          obj = setROI(obj, width, height);   %% Function prototype for setting the ROI

@@ -28,7 +28,7 @@ classdef camPhotonFocus < handle
         sensorWidthMax  = 1312;  % Width of the sensor
         sensorHeightMax = 1082; % Height of the sensor
         authorized_pixelFormat = {'Mono8',  'Mono10',  'Mono12'};
-        authorized_Trigger = {'Immediate','Manual', 'Hardware'}; %% Reserved (not used)
+        authorized_Trigger = {'immediate','manual', 'hardware'}; %% Reserved (not used)
      
     end
     
@@ -157,6 +157,12 @@ classdef camPhotonFocus < handle
           %%%%%%% Getting the Current ROI
           stringROI = getROI(obj);
         
+          
+          %%%%Get the image height
+          obj = getImageHeight(obj);
+          
+          %%% Get the image width
+          obj = getImageWidth(obj);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
           %%% Close the camera

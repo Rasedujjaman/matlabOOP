@@ -93,21 +93,44 @@ camPcoPanda.stMethod(arg);
 
 
 
-%%%% The camPhotonFocus class 
-classdef camPhotonFocus
+
+%%%% The camPcoPanda class 
+classdef camPcoPanda
 import DevicePack.*
-import DevicePack.camPhotonFocus.*
+import DevicePack.camPcoPanda.*
 
 % Call package function
 z = pkfcn(x,y);
 
 % Creation class object
-obj=camPhotonFocus(arg);
+obj=camPcoPanda(arg);
 
 % Call class object method
 obj.myMethod(arg);
 % Of the static method of the class
-camPhotonFocus.stMethod(arg);
+camPcoPanda.stMethod(arg);
+
+
+
+
+
+
+
+%%%% The camPhotonFocus class 
+classdef CameraPcoPanda
+import DevicePack.*
+import DevicePack.CameraPcoPanda.*
+
+% Call package function
+z = pkfcn(x,y);
+
+% Creation class object
+obj=CameraPcoPanda(arg);
+
+% Call class object method
+obj.myMethod(arg);
+% Of the static method of the class
+CameraPcoPanda.stMethod(arg);
 
 
 
@@ -128,5 +151,7 @@ obj=NKTPLaser(arg);
 obj.myMethod(arg);
 % Of the static method of the class
 NKTPLaser.stMethod(arg);
+
+
 
 

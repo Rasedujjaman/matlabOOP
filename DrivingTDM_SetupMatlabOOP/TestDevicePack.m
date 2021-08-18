@@ -46,6 +46,10 @@ camZyla.setROI(1392, 1040);
 % % camZyla.setROI(528, 512);
 
 
+
+
+
+
 %% Test the pco.panda camear
 camPanda = DevicePack.camPcoPanda;
 

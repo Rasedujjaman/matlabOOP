@@ -14,5 +14,7 @@ function outImageFrame = getImageFrame(obj)
 % %             disp('Toto');
             [rc,outImageFrame] = AT_ConvertMono16ToMatrix(buf,obj.height,obj.width, obj.stride);
              AT_CheckWarning(rc);
+             
+% %              obj.Image = outImageFrame;  %% Update the variable containing the image 
             
  end

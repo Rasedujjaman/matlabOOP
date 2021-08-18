@@ -7,6 +7,14 @@ classdef camAndorZyla < handle
     
     %   Detailed explanation goes here
     
+    properties (Constant = true)
+        
+        SensorWidth  = 2560;
+        SensorHeight = 2160;
+    end
+    
+    
+    
     properties (Access = private)
         
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -14,7 +22,7 @@ classdef camAndorZyla < handle
         width       %% sensor width
         height      %% sensor height 
         top         %% sensor top 
-        left      %% sensor left
+        left        %% sensor left
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
@@ -26,7 +34,9 @@ classdef camAndorZyla < handle
     
     properties (Access = public)
     
-     hndl   %% the camera handle 
+        hndl    %% the camera handle 
+        Image;  %% The captured image
+        IsLiveON = 0; 
     end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
