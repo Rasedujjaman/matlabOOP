@@ -14,6 +14,8 @@ classdef CameraPcoPanda < handle
         SensorWidth  = 2048; % Sensor size
         SensorHeight = 2048;
         
+        
+        ExpoTimeMax = 5000;   %% Maximum permissible exposure time in (ms)
         Authorized_Trigger = {'immediate','manual', 'hardware'};
             % 'immediate' : software controlled
             % 'hardware' : TLL on the TRIG IN input
@@ -32,7 +34,7 @@ classdef CameraPcoPanda < handle
         AcqNumber = 0; % Acquisition Number
         ROIWidth =  2048; % ROI Size
         ROIHeight = 2048;
-        E1ExposureTime_unit = 'ms';  %% mili second 
+        ExposureTime_unit = 'ms';  %% mili second 
                                 %%% other possible unit ('ns', 'um');
         ExposureTime = 10; %Exposure Time
         Movie;
@@ -54,6 +56,8 @@ classdef CameraPcoPanda < handle
             obj.src = getselectedsource(obj.vid);
             obj.vid.FramesPerTrigger = 1;
             obj.vid.TriggerRepeat = 1;
+            
+            obj.src.E1ExposureTime_unit = 'ms';
             triggerconfig(obj.vid, 'manual');
             % Save video onto RAM, unless asked to write on the disk
             obj.vid.LoggingMode = 'memory';
@@ -64,7 +68,8 @@ classdef CameraPcoPanda < handle
         end
         
         
-        
+    %% Function prototype to set the exposure time
+    obj = setExposureTime(obj, ExpoTime);
         
         
 	%% Function prototype to make the camera ready for image capture
@@ -94,6 +99,19 @@ classdef CameraPcoPanda < handle
 	%%% This function will return the Captured image frame
 
 	obj = getImageFrame(obj);  %% function prototype for image capture
+    
+    
+    %% Show preview
+    obj = showPreview(obj);
+    %% Stop preview
+    obj = stopPreview(obj);
+    
+    %%
+    %%% Get the height of the camera sensor
+    obj = getSensorHeightMax(obj);
+
+    %%% Get the width of the camera sensor
+    obj = getSensorWidthMax(obj);
     
 	%% Close the device 
 	closeDevices(obj);

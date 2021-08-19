@@ -14,18 +14,27 @@ function setROI(obj,Width,Height)
         return;  %% function setROI will be stopped
     end
 
+    %%% Check if the given ROI value is permitted by the camera
+    if(mod(Width, 32) == 0 && Width <= obj.SensorWidth &&...
+       mod(Height, 32) == 0 && Height <= obj.SensorHeight)
+        
+    
 
-    %%% Check if the camera is in capture mode
-    %%% When the camera is in capture, ROI can not be set
-    if(obj.IsCaptureON == 1)
-        StopCapture(obj);  %% Stop the capture mode of the camera
+        %%% Check if the camera is in capture mode
+        %%% When the camera is in capture, ROI can not be set
+        if(obj.IsCaptureON == 1)
+            StopCapture(obj);  %% Stop the capture mode of the camera
+        end
+
+        deltaX = floor(obj.SensorWidth - Width)/2;
+        deltaY = floor(obj.SensorHeight - Height)/2;
+        obj.vid.ROIPosition = [deltaX deltaY Width Height];
+        obj.ROIWidth = Width;
+        obj.ROIHeight = Height;
+
+        disp('ROI is set properly');
+    else
+        disp('Check correct ROI value');
     end
     
-    deltaX = floor(obj.SensorWidth - Width)/2;
-    deltaY = floor(obj.SensorHeight - Height)/2;
-    obj.vid.ROIPosition = [deltaX deltaY Width Height];
-    obj.ROIWidth = Width;
-    obj.ROIHeight = Height;
-    
-    disp('ROI is set properly');
 end

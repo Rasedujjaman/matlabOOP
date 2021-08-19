@@ -5,13 +5,13 @@
     function obj = setExposureTime(obj, ExpoTime)
             
            
-            if(ExpoTime >=1 && ExpoTime <= 350)
+            if(ExpoTime >=1 && ExpoTime <= obj.ExpoTimeMax)
             
                 obj.vid.ExposureTimeAbs = ExpoTime; %% vid is the camera handle variable
 
                 obj.exposuretime = ExpoTime;  %% update the new exposure time to the class property 'exposuretime'
                 disp('Exposure time is set properly');
             else
-                disp('Exposure time should be 1 to 350');
+                disp('Exposure time should be 1 to 335');
             end
         end

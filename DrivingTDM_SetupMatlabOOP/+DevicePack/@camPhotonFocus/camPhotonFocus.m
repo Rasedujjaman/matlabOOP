@@ -29,6 +29,7 @@ classdef camPhotonFocus < handle
         sensorHeightMax = 1082; % Height of the sensor
         authorized_pixelFormat = {'Mono8',  'Mono10',  'Mono12'};
         authorized_Trigger = {'immediate','manual', 'hardware'}; %% Reserved (not used)
+        ExpoTimeMax = 335;   %% Maximum permissible exposure time in (ms)
      
     end
     
@@ -97,75 +98,81 @@ classdef camPhotonFocus < handle
             end
             
     
-         else  %% If no parameter is passed to the constructor
+        else	%% If no parameter is passed to the constructor
              
-                obj.vid = gigecam(1, 'PixelFormat', obj.pixelFormat);
-                % Change the Packet Size (GevSCPSPacketSize) property
-                % The value must not exceed the Jumbo Packet value (set to 9014)
-                obj.vid.GevSCPSPacketSize  = 8000;
+            obj.vid = gigecam(1, 'PixelFormat', obj.pixelFormat);
+            % Change the Packet Size (GevSCPSPacketSize) property
+            % The value must not exceed the Jumbo Packet value (set to 9014)
+            obj.vid.GevSCPSPacketSize  = 8000;
 
               
               
-              obj.packetDelayTime = obj.getPacketDelay(25);
-              % % % Set the Packet Delay (GevSCPD) property
-              obj.vid.GevSCPD =  obj.packetDelayTime;
-         end
+            obj.packetDelayTime = obj.getPacketDelay(25);
+            % % % Set the Packet Delay (GevSCPD) property
+            obj.vid.GevSCPD =  obj.packetDelayTime;
+        end
         end
              
         
         
-        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-         obj = setDefaultParameters(obj);  %% This function will be reset the values of the camera to default
+        obj = setDefaultParameters(obj);  %% This function will be reset the values of the camera to default
          
          
          
-         obj = setPixelFormat(obj, pixel_format)  %% This function will set the pixel format of the sensor
+        obj = setPixelFormat(obj, pixel_format)  %% This function will set the pixel format of the sensor
         
         
        
         
-         %%% Setting the exposure time of the camera
-         obj = setExposureTime(obj, ExpoTime); %% Function prototype to set the exposure time
+        %%% Setting the exposure time of the camera
+        obj = setExposureTime(obj, ExpoTime); %% Function prototype to set the exposure time
  
-         %%% Setting the ROI of the camera
-          obj = setROI(obj, width, height);
+        %%% Setting the ROI of the camera
+        obj = setROI(obj, width, height);
         
-       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-       %%% All getter functions (methods)
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% All getter functions (methods)
          
-         obj = getPacketDelay(obj, fps);
-         %%%%%%%%%%%%%%%%%%%%% Display the informations about the devices
-         getDevicesInfos(obj);
+        obj = getPacketDelay(obj, fps);
+        %%%%%%%%%%%%%%%%%%%%% Display the informations about the devices
+        getDevicesInfos(obj);
         
         
         %%% This function will return the image frame 
         
-         obj = getImageFrame(obj);  %% function prototype for image capture
+        obj = getImageFrame(obj);  %% function prototype for image capture
         
-         %%%% This function will retun the current pixel format
-         [pixel_format] = getPixelFormat(obj); %% This will return the pixel format of the camera sensor
+        %%%% This function will retun the current pixel format
+        [pixel_format] = getPixelFormat(obj); %% This will return the pixel format of the camera sensor
         
          
-         obj =  getDefaultParameters(obj);  %%% This will return the default parameter of the camera
+        obj =  getDefaultParameters(obj);  %%% This will return the default parameter of the camera
          
          
-         %%% getting the exposure time of the camera
-          obj = getExposureTime(obj);
+        %%% getting the exposure time of the camera
+        obj = getExposureTime(obj);
         
-          %%%%%%% Getting the Current ROI
-          stringROI = getROI(obj);
+        %%%%%%% Getting the Current ROI
+        stringROI = getROI(obj);
         
           
-          %%%%Get the image height
-          obj = getImageHeight(obj);
+        %%%%Get the image height
+        obj = getImageHeight(obj);
           
-          %%% Get the image width
-          obj = getImageWidth(obj);
+        %%% Get the image width
+        obj = getImageWidth(obj);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        obj = StopCapture(obj)
+        
+        %%% Get the height of the camera sensor
+        obj = getSensorHeightMax(obj);
+        
+        %%% Get the width of the camera sensor
+        obj = getSensorWidthMax(obj);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
-          %%% Close the camera
+        %%% Close the camera
         % % % % % % Close the devices
         closeDevices(obj);   %% function signature to close the camera
       
