@@ -11,6 +11,10 @@ classdef camAndorZyla < handle
         
         SensorWidth  = 2560;
         SensorHeight = 2160;
+        
+        ExpoTimeMax  = 50;  %% Maximum permissible exposure time in (ms)
+        
+        
     end
     
     
@@ -129,8 +133,16 @@ classdef camAndorZyla < handle
         %%% Set the default ROI of the camera
         obj = setROIdefault(obj); %%% Function prototype to set the default ROI of the camera
           
-          
-          
+        
+        %%% This is a dummy function 
+        obj = StopCapture(obj)
+        
+        %%% Get the height of the camera sensor
+        obj = getSensorHeightMax(obj);
+
+        %%% Get the width of the camera sensor
+        obj = getSensorWidthMax(obj); 
+
           %%% Close the camera
         % % % % % % Close the devices
        closeDevices(obj);   %% function signature to close the camera

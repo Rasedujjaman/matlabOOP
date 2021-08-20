@@ -18,6 +18,14 @@ classdef Dac
     properties (Access = public)
         voltChannelX = 0   %% voltage to the channelX (default voltage is set to zero)
         voltChannelY = 0   %% voltage to the channelY (default voltage is set to zero)
+        
+        maxVoltChannelX = 6;  %% Maximum allowed voltage to for channel X
+        minVoltChannelX = -6; %% Minimum allowed voltage to for channel X
+        
+        maxVoltChannelY = 6;   %% Maximum allowed voltage to for channel Y
+        minVoltChannelY = -6;  %% Minimum allowed voltage to for channel Y
+        
+        
     end
     
     methods
@@ -63,7 +71,10 @@ classdef Dac
          putVoltage(obj, voltX, voltY);  %% function prototype for supplying voltage
       
          
-         
+         %% put voltage to channelx only
+         putVoltageChX(obj, voltChX);
+         %% Put voltage to channelY only
+         putVoltageChY(obj, voltChY);
         %% Go to zero position
         obj = goHome(obj);   %% function prototype to set both the channel voltage at zero
             

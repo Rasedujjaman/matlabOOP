@@ -3,6 +3,6 @@
              
             ExpoTime = obj.vid.ExposureTimeAbs;
 % %             ExpoTime = obj.exposuretime;
-            disp(ExpoTime);
+% %             disp(ExpoTime);
             
     end

@@ -15,6 +15,9 @@ function outImageFrame = getImageFrame(obj)
             [rc,outImageFrame] = AT_ConvertMono16ToMatrix(buf,obj.height,obj.width, obj.stride);
              AT_CheckWarning(rc);
              
-% %              obj.Image = outImageFrame;  %% Update the variable containing the image 
+% %              pause(obj.getExposureTime()/1000);  %% Wait to transfer back the image from camera to workspace
+             
+             pause(obj.getExposureTime()*20);
+             obj.Image = outImageFrame;  %% Update the variable containing the image 
             
  end

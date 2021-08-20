@@ -5,11 +5,12 @@
 close all
 clear all
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Connect to the devices
 %%%Connect the AndorZyla camera
-% % Camera = DevicePack.camAndorZyla; 
-% % Camera.setROI(1392, 1040);
+Camera = DevicePack.camAndorZyla; 
+Camera.setROI(528, 512);
 
 %%% Connect the photon focus camera
 % % Camera = DevicePack.camPhotonFocus;
@@ -17,9 +18,18 @@ clear all
 
 
 %%% 
- Camera = DevicePack.CameraPcoPanda;
- Camera.setROI(256, 256);
-%% Size of the computer screen. The programm assumes a 16:9 ratio
+% %  Camera = DevicePack.CameraPcoPanda;
+% %  Camera.setROI(256, 256);
+ 
+ 
+ %%% The Laser
+ Laser = DevicePack.NKTPLaser;
+
+ %%% The Dac
+ Dq = DevicePack.Dac();
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %% Size of the computer screen. The programm assumes a 16:9 ratio
 %%% Chose one of the below ScreenWidth that fits well
 ScreenWidth = 1680;
 % % ScreenWidth = 1920;
@@ -114,7 +124,7 @@ PanelWidthtStart = floor(0.702*ScreenWidth);
 CameraPanel.Position=[PanelWidthtStart  PanelHeightStart ...
 CommandWidth- SpaceSize  CameraPanelHeight];
 CameraPanel.BorderType = 'line';
-CameraPanel.BackgroundColor = DarkGray;
+CameraPanel.BackgroundColor = [0.4660 0.6740 0.1880];
 % Title
 CameraPanel.FontSize = TitleFontSize;
 CameraPanel.Title = 'CAMERA'; CameraPanel.TitlePosition = 'centertop';
@@ -234,6 +244,184 @@ MaxIntensityValue.ValueDisplayFormat = '%d';
 MaxIntensityValue.Value = 0; MaxIntensityValue.FontWeight = 'bold'; MaxIntensityValue.FontSize = TextFontSize;
 
 
+
+
+%%
+LaserPanel = uipanel(Main); 
+LaserPanel.Units='pixels';
+LaserPanelHeight = 4*TextHeight;
+PanelHeightStart = floor(0.65*ScreenHeigth)- CameraPanelHeight - LaserPanelHeight;
+PanelWidthtStart = floor(0.702*ScreenWidth);
+LaserPanel.Position=[PanelWidthtStart  PanelHeightStart ...
+CommandWidth- SpaceSize  LaserPanelHeight];
+
+LaserPanel.BorderType = 'line';
+LaserPanel.BackgroundColor = [0 0.4470 0.7410];
+% Title
+LaserPanel.FontSize = TitleFontSize;
+LaserPanel.Title = 'LASER'; LaserPanel.TitlePosition = 'centertop';
+
+% Text ON/OFF 
+LaserOnOffButton = uibutton(LaserPanel,'state');
+LaserOnOffButton.Text = 'ON/OFF'; LaserOnOffButton.FontWeight = 'bold'; LaserOnOffButton.FontSize = TextFontSize;
+HeightStart1 = LaserPanelHeight-2*TextHeight - 2*SpaceSize;
+WidthStart = SpaceSize;
+LaserOnOffButton.Position=[WidthStart HeightStart1 4.5*TextFontSize TextHeight]; 
+
+%
+HeightStart2 = HeightStart1 - 5*SpaceSize;
+% Laser power level
+% Text "Power"
+PowerLabel = uilabel(LaserPanel);
+PowerLabel.Position=[WidthStart HeightStart2 6*TextFontSize TextHeight];
+PowerLabel.Text = 'Power(%)'; PowerLabel.FontWeight = 'bold'; PowerLabel.FontSize = TextFontSize;
+PowerLabel.FontColor = [0.6350 0.0780 0.1840];
+HeightStart3 = HeightStart2 - 5*SpaceSize;
+
+
+%  Power level (numeric value)
+PowerValue = uieditfield(LaserPanel,'numeric');
+PowerValue.Position = [WidthStart HeightStart3  4.7*TextFontSize TextHeight];
+PowerValue.ValueDisplayFormat = '%d';
+PowerValue.Value = 5; PowerValue.FontWeight = 'bold'; PowerValue.FontSize = TextFontSize;
+PowerValue.Limits = [0 Laser.maxPowerLevel]; PowerValue.LowerLimitInclusive = 'on'; PowerValue.UpperLimitInclusive = 'on';
+
+
+% Text Wavelength
+% 
+WavelengthLabel = uilabel(LaserPanel);
+WavelengthLabel.Text = 'Wavelength(nm)'; WavelengthLabel.FontWeight = 'bold'; WavelengthLabel.FontSize = TextFontSize;
+HeightStart1 = LaserPanelHeight-2*TextHeight - 2*SpaceSize;
+WidthStart = 6.5*TextFontSize ;
+WavelengthLabel.Position=[WidthStart HeightStart1 8*TextFontSize TextHeight]; 
+
+%  Wavelength value  (numeric value)
+WavelengthValue = uieditfield(LaserPanel,'numeric');
+HeightStart2 = HeightStart1 - 7*SpaceSize;
+WidthStart = WidthStart + 5*SpaceSize;
+WavelengthValue.Position = [WidthStart HeightStart2  4.7*TextFontSize TextHeight];
+WavelengthValue.ValueDisplayFormat = '%d';
+WavelengthValue.Value = Laser.defaultWaveLength; WavelengthValue.FontWeight = 'bold'; WavelengthValue.FontSize = TextFontSize;
+WavelengthValue.Limits = [Laser.minWavelength Laser.maxWavelength]; WavelengthValue.LowerLimitInclusive = 'on'; 
+WavelengthValue.UpperLimitInclusive = 'on';
+
+
+
+% Text Bandwidth 
+BandwidthLabel = uilabel(LaserPanel);
+BandwidthLabel.Text = 'Bandwidth(nm)'; BandwidthLabel.FontWeight = 'bold'; BandwidthLabel.FontSize = TextFontSize;
+HeightStart1 = LaserPanelHeight-2*TextHeight - 2*SpaceSize;
+WidthStart = CommandWidth - 12.8*TextFontSize ;
+BandwidthLabel.Position=[WidthStart HeightStart1 7.5*TextFontSize TextHeight]; 
+
+%  Bandwidth value  (numeric value)
+BandwidthValue = uieditfield(LaserPanel,'numeric');
+
+HeightStart2 = HeightStart1 - 7*SpaceSize;
+WidthStart = WidthStart + 5*SpaceSize;
+
+BandwidthValue.Position = [WidthStart HeightStart2  4.7*TextFontSize TextHeight];
+BandwidthValue.ValueDisplayFormat = '%d';
+BandwidthValue.Value = Laser.defaultBandWidth; BandwidthValue.FontWeight = 'bold'; BandwidthValue.FontSize = TextFontSize;
+BandwidthValue.Limits = [Laser.minBandWidth Laser.maxBandWidth]; BandwidthValue.LowerLimitInclusive = 'on'; 
+BandwidthValue.UpperLimitInclusive = 'on';
+
+%% DAC  Panel
+DacPanel = uipanel(Main); 
+DacPanel.Units='pixels';
+DacPanelHeight = 3.8*TextHeight;
+PanelHeightStart = floor(0.65*ScreenHeigth)- CameraPanelHeight - LaserPanelHeight - DacPanelHeight;
+PanelWidthtStart = floor(0.702*ScreenWidth);
+DacPanel.Position=[PanelWidthtStart  PanelHeightStart ...
+CommandWidth- SpaceSize  DacPanelHeight];
+
+DacPanel.BorderType = 'line';
+DacPanel.BackgroundColor = [0.4940 0.1840 0.5560];
+% Title
+DacPanel.FontSize = TitleFontSize;
+DacPanel.Title = 'DAC'; DacPanel.TitlePosition = 'centertop';
+
+% Text ChannelX (this corresponds to channel # 0) 
+ChannelXLabel = uilabel(DacPanel);
+ChannelXLabel.Text = 'ChX(volt)'; ChannelXLabel.FontWeight = 'bold'; ChannelXLabel.FontSize = TextFontSize;
+HeightStart1 = DacPanelHeight -2*TextHeight - 2*SpaceSize;
+WidthStart = CommandWidth - 16*TextHeight;
+ChannelXLabel.Position=[WidthStart HeightStart1 7.5*TextFontSize TextHeight]; 
+
+%  ChannelX value  (numeric value)
+ChannelXValue = uieditfield(DacPanel,'numeric');
+
+WidthStart1 = CommandWidth - 12.6*TextHeight;
+ChannelXValue.Position = [WidthStart1 HeightStart1  4*TextFontSize TextHeight];
+ChannelXValue.ValueDisplayFormat = '%d';
+ChannelXValue.Value = 0; ChannelXValue.FontWeight = 'bold'; ChannelXValue.FontSize = TextFontSize;
+ChannelXValue.Limits = [Dq.minVoltChannelX  Dq.maxVoltChannelX]; ChannelXValue.LowerLimitInclusive = 'on'; 
+ChannelXValue.UpperLimitInclusive = 'on';
+ChannelXValue.ValueDisplayFormat = '%0.3f';
+
+% Slider ChannelX (this corresponds to channel # 0) 
+ChannelXSlider = uislider(DacPanel);
+HeightStart2 = HeightStart1 - 3*SpaceSize;
+
+ChannelXSlider.Position=[WidthStart HeightStart2  10*TextFontSize  3]; 
+ChannelXSlider.Value = 0; %% The default value of the slider
+ChannelXSlider.Limits = [Dq.minVoltChannelX  Dq.maxVoltChannelX]; 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Text ChannelY (this corresponds to channel # 1) 
+ChannelYLabel = uilabel(DacPanel);
+ChannelYLabel.Text = 'ChY(volt)'; ChannelYLabel.FontWeight = 'bold'; ChannelYLabel.FontSize = TextFontSize;
+HeightStart1 = DacPanelHeight -2*TextHeight - 2*SpaceSize;
+WidthStart = CommandWidth - 6.4*TextHeight;
+ChannelYLabel.Position=[WidthStart HeightStart1 7.5*TextFontSize TextHeight]; 
+
+%  ChannelY value  (numeric value)
+ChannelYValue =  uieditfield(DacPanel,'numeric');
+
+WidthStart1 = CommandWidth - 3*TextHeight;
+ChannelYValue.Position = [WidthStart1 HeightStart1  4*TextFontSize TextHeight];
+ChannelYValue.ValueDisplayFormat = '%d';
+ChannelYValue.Value = 0; ChannelYValue.FontWeight = 'bold'; ChannelYValue.FontSize = TextFontSize;
+ChannelYValue.Limits = [Dq.minVoltChannelY  Dq.maxVoltChannelY]; ChannelYValue.LowerLimitInclusive = 'on'; 
+ChannelYValue.UpperLimitInclusive = 'on';
+ChannelYValue.ValueDisplayFormat = '%0.3f';
+% Slider ChannelY (this corresponds to channel # 0) 
+ChannelYSlider = uislider(DacPanel);
+HeightStart2 = HeightStart1 - 3*SpaceSize;
+
+ChannelYSlider.Position=[WidthStart HeightStart2  10*TextFontSize  3]; 
+ChannelYSlider.Value = 0; %% The default value of the slider
+ChannelYSlider.Limits = [Dq.minVoltChannelY  Dq.maxVoltChannelY]; 
+
+
+% Text DEFAULT 
+DacGoHomeButton = uibutton(DacPanel,'state');
+DacGoHomeButton.Text = 'DEFAULT'; DacGoHomeButton.FontWeight = 'bold'; DacGoHomeButton.FontSize = TextFontSize;
+HeightStart = DacPanelHeight -2*TextHeight - 8*SpaceSize;
+WidthStart = CommandWidth - 9.7*TextHeight;
+DacGoHomeButton.Position=[WidthStart HeightStart  5*TextFontSize TextHeight]; 
+DacGoHomeButton.FontColor = [0.4660 0.6740 0.1880];
+
+%%
+%% Acquisition Panel
+AcquisitionPanel = uipanel(Main); 
+AcquisitionPanel.Units='pixels';
+% % AcquisitionPanelHeight = 7*TextHeight;
+AcquisitionPanelHeight = floor(0.65*ScreenHeigth)- CameraPanelHeight - LaserPanelHeight...
+    - DacPanelHeight - SpaceSize;
+PanelHeightStart = floor(0.65*ScreenHeigth)- CameraPanelHeight - LaserPanelHeight...
+    - DacPanelHeight - AcquisitionPanelHeight;
+PanelWidthtStart = floor(0.702*ScreenWidth);
+AcquisitionPanel.Position=[PanelWidthtStart  PanelHeightStart ...
+CommandWidth-SpaceSize  AcquisitionPanelHeight];
+
+AcquisitionPanel.BorderType = 'line';
+AcquisitionPanel.BackgroundColor = [0.3010 0.7450 0.9330];
+% Title
+AcquisitionPanel.FontSize = TitleFontSize;
+AcquisitionPanel.Title = 'ACQUISITION'; AcquisitionPanel.TitlePosition = 'centertop';
+
+
 %% All actions are implemented here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Camera
@@ -243,7 +431,23 @@ set(ExposureValue,'ValueChangedFcn',@(src,event) SetCameraExposure(Camera,Exposu
 set(ROIWidthValue,'ValueChangedFcn',@(src,event) SetCameraROI(Camera,ROIWidthValue.Value,ROIHeightValue.Value,CameraImage, CameraImageKspace));
 set(ROIHeightValue,'ValueChangedFcn',@(src,event) SetCameraROI(Camera,ROIWidthValue.Value,ROIHeightValue.Value,CameraImage, CameraImageKspace));
 
+
+% Laser
+set(LaserOnOffButton,'ValueChangedFcn',@(src,event) LaserOnOff(Laser,LaserOnOffButton.Value));
+set(PowerValue,'ValueChangedFcn',@(src,event) SetLaserPower(Laser, PowerValue.Value));
+set(WavelengthValue,'ValueChangedFcn',@(src,event) SetLaserWavelength(Laser, WavelengthValue.Value));
+set(BandwidthValue,'ValueChangedFcn',@(src,event) SetLaserBandwidth(Laser, BandwidthValue.Value));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Dac
+set(ChannelXValue,'ValueChangedFcn',@(src,event) SetDacChXvolt(Dq, ChannelXSlider, ChannelXValue,  ChannelXValue.Value));
+set(ChannelXSlider,'ValueChangedFcn',@(src,event) SetDacChXvolt(Dq, ChannelXSlider, ChannelXValue, ChannelXSlider.Value));
+
+set(ChannelYValue,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue,  ChannelYValue.Value));
+set(ChannelYSlider,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue, ChannelYSlider.Value));
+
+set(DacGoHomeButton,'ValueChangedFcn',@(src,event) SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue, DacGoHomeButton.Value));
 
 
 %% Camera
@@ -293,3 +497,57 @@ function SetCameraROI(Camera, Width,Height,CameraImage, CameraImageKspace)
     CameraImageKspace.XLim = [0,Width]; CameraImageKspace.YLim = [0,Height];
 end
 
+
+%%
+% Laser turn ON and turn OFF 
+function LaserOnOff(Laser, OnOffValue)
+    if (OnOffValue == 1)
+        Laser.turnONdevice();
+    end
+    if(OnOffValue == 0)
+        Laser.turnOFFdevice();
+    end
+end
+
+% Set the laser Power
+%%% The Laser Power
+function SetLaserPower(Laser,powerLevel)
+    Laser.setPowerLevel(powerLevel);
+end
+
+% Set the laser wavelength
+function SetLaserWavelength(Laser, lambda)
+    Laser.setWavelength(lambda);
+end
+
+
+function SetLaserBandwidth(Laser, spectralBandwidth)
+    Laser.setBandWidth(spectralBandwidth);
+end
+
+
+%%
+%%% set the channel X voltage of Dac
+function SetDacChXvolt(Dq, ChannelXSlider, ChannelXValue, voltage)
+    Dq.putVoltageChX(voltage);
+    ChannelXSlider.Value = voltage;
+    ChannelXValue.Value = voltage;
+end
+
+ %%% set the channel Y voltage of Dac
+function SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue, voltage)
+    Dq.putVoltageChY(voltage);
+    ChannelYSlider.Value = voltage;
+    ChannelYValue.Value = voltage;
+end
+
+%%% set the Dac to default (both channel voltage is set to 0 volt)
+function SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue, Value)
+    if(Value == 1)
+        Dq.goHome();
+        ChannelXSlider.Value = 0;
+        ChannelXValue.Value =  0;
+        ChannelYSlider.Value = 0;
+        ChannelYValue.Value =  0;
+    end
+end

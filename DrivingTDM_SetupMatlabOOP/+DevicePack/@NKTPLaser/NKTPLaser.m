@@ -77,6 +77,12 @@ classdef NKTPLaser < handle
         
         
     end
+    
+    properties (Access = public)
+        isLaserON = 0;  %% This will indicates the status of the LASER
+                        %%%  isLaserON = 0: Laser is in OFF state
+                        %%%  isLaserON = 1: Laser is in ON state
+    end
    
     
     
@@ -176,11 +182,14 @@ classdef NKTPLaser < handle
         
         
         
-        
+        %% Turn OFF the LASER
+        obj = turnOFFdevice(obj);
         
         
         %% Turn of the LASER
-        %%% Function prototype to Trun OFF the laser
+        %%% Function prototype to Trun OFF the laser and unload the library
+        %%%  call this function if you do not want to Turn on the laser
+        %%%  again 
        closeDevices(obj);
        
    

@@ -1,5 +1,5 @@
   % % % This function will turn off the laser and unload the libraries
-        
+  %%%% Call this function only at the end of your experiment       
         function  closeDevices(obj)
             %%% To turn off the laser
             %%% Before turning OFF the laser, all the parameters are set to
