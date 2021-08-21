@@ -9,8 +9,8 @@ clear all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Connect to the devices
 %%%Connect the AndorZyla camera
-Camera = DevicePack.camAndorZyla; 
-Camera.setROI(528, 512);
+% % Camera = DevicePack.camAndorZyla; 
+% % Camera.setROI(528, 512);
 
 %%% Connect the photon focus camera
 % % Camera = DevicePack.camPhotonFocus;
@@ -18,8 +18,8 @@ Camera.setROI(528, 512);
 
 
 %%% 
-% %  Camera = DevicePack.CameraPcoPanda;
-% %  Camera.setROI(256, 256);
+ Camera = DevicePack.CameraPcoPanda;
+ Camera.setROI(256, 256);
  
  
  %%% The Laser
@@ -27,6 +27,23 @@ Camera.setROI(528, 512);
 
  %%% The Dac
  Dq = DevicePack.Dac();
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% The file path where the data will be stored
+TodaysDataFolder = datestr(now, 'ddmmyyyy');
+
+if  ~(isfolder(['E:\DataAcquisition\Snapshot\', TodaysDataFolder]))
+    mkdir(['E:\DataAcquisition\Snapshot\', TodaysDataFolder]);
+end
+
+SnapFilePath = ['E:\DataAcquisition\Snapshot\', TodaysDataFolder, '\'] ;
+
+if  ~(isfolder(['E:\DataAcquisition\Scan\', TodaysDataFolder]))
+    mkdir(['E:\DataAcquisition\Scan\', TodaysDataFolder]);
+end
+
+ScanFilePath = ['E:\DataAcquisition\Scan\', TodaysDataFolder, '\'];
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %% Size of the computer screen. The programm assumes a 16:9 ratio
@@ -394,10 +411,10 @@ ChannelYSlider.Value = 0; %% The default value of the slider
 ChannelYSlider.Limits = [Dq.minVoltChannelY  Dq.maxVoltChannelY]; 
 
 
-% Text DEFAULT 
+% DEFAULT  button
 DacGoHomeButton = uibutton(DacPanel,'state');
 DacGoHomeButton.Text = 'DEFAULT'; DacGoHomeButton.FontWeight = 'bold'; DacGoHomeButton.FontSize = TextFontSize;
-HeightStart = DacPanelHeight -2*TextHeight - 8*SpaceSize;
+HeightStart = DacPanelHeight - 2*TextHeight - 8*SpaceSize;
 WidthStart = CommandWidth - 9.7*TextHeight;
 DacGoHomeButton.Position=[WidthStart HeightStart  5*TextFontSize TextHeight]; 
 DacGoHomeButton.FontColor = [0.4660 0.6740 0.1880];
@@ -420,6 +437,80 @@ AcquisitionPanel.BackgroundColor = [0.3010 0.7450 0.9330];
 % Title
 AcquisitionPanel.FontSize = TitleFontSize;
 AcquisitionPanel.Title = 'ACQUISITION'; AcquisitionPanel.TitlePosition = 'centertop';
+
+
+% Scan pattern drop down menue
+ScanPatternDropDown = uidropdown(AcquisitionPanel);
+ScanPatternDropDown.Items = {'No pattern selected','Raster type','Snake motion type','Circular type','Spiral type'};
+ScanPatternDropDown.FontColor = 'blue';
+
+WidthStart = CommandWidth - 5*TextHeight;
+HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
+
+ScanPatternDropDownWidth = 4.6*TextHeight;
+ScanPatternDropDownHeight =  TextHeight;
+
+ScanPatternDropDown.Position=[WidthStart  HeightStart ...
+ScanPatternDropDownWidth  ScanPatternDropDownHeight];
+
+% Text Scan pattern dropdown menue
+textScanPatternDropDown = uilabel(AcquisitionPanel);
+
+textScanPatternDropDown.Text = 'Select scan pattern'; 
+textScanPatternDropDown.FontWeight = 'bold';
+textScanPatternDropDown.FontSize = 14;
+
+HeightStart1 = HeightStart + 5*SpaceSize;
+
+
+textScanPatternDropDown.Position=[WidthStart+SpaceSize  HeightStart1 4.6*TextHeight TextHeight]; 
+textScanPatternDropDown.FontColor = 'blue';
+
+% Sleep time drop down menue
+SleepTimeDropDown = uidropdown(AcquisitionPanel);
+SleepTimeDropDown.Items = {'Not selected','0.00','0.02','0.05','0.10', '0.20', '0.30'};
+SleepTimeDropDown.FontColor = 'blue';
+
+WidthStart = CommandWidth - 9*TextHeight-SpaceSize;
+HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
+
+SleepTimeDropDownWidth = 4*TextHeight;
+SleepTimeDropDownHeight =  TextHeight;
+
+SleepTimeDropDown.Position=[WidthStart  HeightStart ...
+SleepTimeDropDownWidth  SleepTimeDropDownHeight];
+
+
+% Text SleepTimeDropDown menue
+textSleepTimeDropDown = uilabel(AcquisitionPanel);
+textSleepTimeDropDown.Text = 'Select sleep time'; 
+textSleepTimeDropDown.FontWeight = 'bold';
+textSleepTimeDropDown.FontSize = 14;
+HeightStart1 = AcquisitionPanelHeight - 6.8*TextHeight + 5*SpaceSize;
+WidthStart = CommandWidth - 9*TextHeight-SpaceSize;
+textSleepTimeDropDown.Position=[WidthStart+SpaceSize  HeightStart1 4.6*TextHeight TextHeight]; 
+textSleepTimeDropDown.FontColor = 'blue';
+
+% Scan  button
+ScanButton = uibutton(AcquisitionPanel,'state');
+ScanButton.Text = 'SCAN'; ScanButton.FontWeight = 'bold'; ScanButton.FontSize = TextFontSize;
+
+HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
+WidthStart  = CommandWidth - 12.4*TextHeight + SpaceSize;
+
+ScanButton.Position=[WidthStart HeightStart  5*TextFontSize TextHeight]; 
+ScanButton.FontColor = 'blue';
+
+
+% Snapshot  button
+SnapshotButton = uibutton(AcquisitionPanel,'state');
+SnapshotButton.Text = 'SNAPSHOT'; SnapshotButton.FontWeight = 'bold'; SnapshotButton.FontSize = TextFontSize;
+
+HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
+WidthStart  = CommandWidth - 16*TextHeight + SpaceSize;
+
+SnapshotButton.Position=[WidthStart HeightStart  6*TextFontSize TextHeight]; 
+SnapshotButton.FontColor = [0.4660 0.6740 0.1880];
 
 
 %% All actions are implemented here
@@ -448,6 +539,12 @@ set(ChannelYValue,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlide
 set(ChannelYSlider,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue, ChannelYSlider.Value));
 
 set(DacGoHomeButton,'ValueChangedFcn',@(src,event) SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue, DacGoHomeButton.Value));
+
+
+% Acquisition
+% The snapbutton
+set(SnapshotButton,'ValueChangedFcn',@(src,event) getOneImage(Camera,SnapFilePath,SnapshotButton.Value));
+
 
 
 %% Camera
@@ -551,3 +648,26 @@ function SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, Channe
         ChannelYValue.Value =  0;
     end
 end
+
+
+%% Aquistion
+
+function getOneImage(Camera,SnapFilePath,SnapshotButton_Value)
+if(SnapshotButton_Value == 1)
+    if(Camera.IsLiveON == true)
+     Camera.IsLiveON = false;
+    end
+    
+   
+    FileName = [SnapFilePath,'Snap',datestr(now,'ddmmyyyyHHMMSS')];
+    
+    
+    img = (Camera.getImageFrame())';
+    save( fullfile(FileName),'img');
+    %save FileName img_snap_one;
+    disp('Snap is taken');
+    Camera.IsLiveON = true;
+
+end
+end
+        
