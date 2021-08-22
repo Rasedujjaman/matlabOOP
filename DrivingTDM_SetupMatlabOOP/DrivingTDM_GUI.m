@@ -503,7 +503,7 @@ ScanButton.FontColor = 'blue';
 
 
 % Snapshot  button
-SnapshotButton = uibutton(AcquisitionPanel,'state');
+SnapshotButton = uibutton(AcquisitionPanel);
 SnapshotButton.Text = 'SNAPSHOT'; SnapshotButton.FontWeight = 'bold'; SnapshotButton.FontSize = TextFontSize;
 
 HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
@@ -534,21 +534,17 @@ set(BandwidthValue,'ValueChangedFcn',@(src,event) SetLaserBandwidth(Laser, Bandw
 % Dac
 set(ChannelXValue,'ValueChangedFcn',@(src,event) SetDacChXvolt(Dq, ChannelXSlider, ChannelXValue,  ChannelXValue.Value));
 set(ChannelXSlider,'ValueChangedFcn',@(src,event) SetDacChXvolt(Dq, ChannelXSlider, ChannelXValue, ChannelXSlider.Value));
-
 set(ChannelYValue,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue,  ChannelYValue.Value));
 set(ChannelYSlider,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue, ChannelYSlider.Value));
-
 set(DacGoHomeButton,'ValueChangedFcn',@(src,event) SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue, DacGoHomeButton.Value));
 
 
 % Acquisition
 % The snapbutton
-set(SnapshotButton,'ValueChangedFcn',@(src,event) getOneImage(Camera,SnapFilePath,SnapshotButton.Value));
-
+set(SnapshotButton,'ButtonPushedFcn', @(SnapshotButton,event) getOneImage(Camera, SnapFilePath));
 
 
 %% Camera
-
 %%% The Live Button
 function CameraLive(Camera,CameraImage, CameraImageKspace, MaxIntensityValue,AvgIntensityValue,CameraLiveValue)
    
@@ -651,23 +647,18 @@ end
 
 
 %% Aquistion
-
-function getOneImage(Camera,SnapFilePath,SnapshotButton_Value)
-if(SnapshotButton_Value == 1)
+%%% The snapshot button
+function getOneImage(Camera,SnapFilePath)
+    %%% Check if the camera is live, if live is on turn it off before the image snap
     if(Camera.IsLiveON == true)
      Camera.IsLiveON = false;
     end
-    
    
     FileName = [SnapFilePath,'Snap',datestr(now,'ddmmyyyyHHMMSS')];
-    
-    
     img = (Camera.getImageFrame())';
     save( fullfile(FileName),'img');
     %save FileName img_snap_one;
     disp('Snap is taken');
-    Camera.IsLiveON = true;
-
-end
+    Camera.IsLiveON = true;  % Turn on the camera live again
 end
         
