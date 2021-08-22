@@ -27,6 +27,10 @@ clear all
 
  %%% The Dac
  Dq = DevicePack.Dac();
+
+
+%%%The SacnPattern
+SacnPattern = DevicePack.scanPattern();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% The file path where the data will be stored
@@ -492,7 +496,7 @@ textSleepTimeDropDown.Position=[WidthStart+SpaceSize  HeightStart1 4.6*TextHeigh
 textSleepTimeDropDown.FontColor = 'blue';
 
 % Scan  button
-ScanButton = uibutton(AcquisitionPanel,'state');
+ScanButton = uibutton(AcquisitionPanel);
 ScanButton.Text = 'SCAN'; ScanButton.FontWeight = 'bold'; ScanButton.FontSize = TextFontSize;
 
 HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
@@ -542,6 +546,8 @@ set(DacGoHomeButton,'ValueChangedFcn',@(src,event) SetDacDefault(Dq, ChannelXSli
 % Acquisition
 % The snapbutton
 set(SnapshotButton,'ButtonPushedFcn', @(SnapshotButton,event) getOneImage(Camera, SnapFilePath));
+set(ScanPatternDropDown,'ValueChangedFcn',@(ScanPatternDropDown, event) ChoseScanPattern(ScanPattern, ScanPatternDropDown.Value));
+set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown.Value));
 
 
 %% Camera
@@ -619,7 +625,7 @@ function SetLaserBandwidth(Laser, spectralBandwidth)
 end
 
 
-%%
+%% Dac
 %%% set the channel X voltage of Dac
 function SetDacChXvolt(Dq, ChannelXSlider, ChannelXValue, voltage)
     Dq.putVoltageChX(voltage);
@@ -661,4 +667,67 @@ function getOneImage(Camera,SnapFilePath)
     disp('Snap is taken');
     Camera.IsLiveON = true;  % Turn on the camera live again
 end
-        
+
+%%% The selection of scan pattern
+
+function ChoseScanPattern(ScanPattern, ScanPatternDropDown.Value)
+switch(ScanPatternDropDown.Value)
+case 'Raster type'
+   ScanPattern.rasterScanPattern();
+case 'Snake motion type'
+   ScanPattern.snakeMovemnetScanPattern();
+case 'Circular type'
+   ScanPattern.circularScanPattern();
+case 'Spiral type'
+   ScanPattern.spiralScanPattern();
+
+otherwise
+   fprintf('Invalid scan pattern\n' );
+end
+end
+
+
+
+%%% The scan function 
+function performScan(Camera, ScanPattern, Dq, ScanFilePath, sleep_time)
+
+ if(Camera.IsLiveON == true)
+     Camera.IsLiveON = false;
+ end
+
+disp('Scaning started.....');
+    tic  %%% to calculate the timing for the scaning 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% Get ready the Dac
+	Dq.goHome();  % Set the both channel to zero voltage
+	voltage_ch0_scan = ScanPattern.voltage_ch0_scan;
+	voltage_ch1_scan = ScanPattern.voltage_ch1_scan;
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     %%%% to alocate the momery
+     sz_stack = size(voltage_ch0_scan, 1);
+     temp_data = Camera.getImageFrame();
+     scan_data = repmat(temp_data, [1, 1, sz_stack]);
+     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    for ii = 1:size(voltage_ch0_scan,1)
+            
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% set the channel voltage
+        %%%%%%%%%%%%%%%%%%%% Writing the voltage to the output channel 
+        Dq.putVoltage(voltage_ch0_scan(ii), voltage_ch1_scan(ii));
+        pause(sleep_time); % sleep time to settle the galvano mirrors
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        scan_data(:,:,ii) = Camera.getImageFrame(); 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end
+    timeElapsed = toc  % to display the total time elapsed 
+    FileName = [ScanFilePath,'scan',datestr(now,'ddmmyyyyHHMMSS')];
+    save( fullfile(FileName),'scan_data')
+    clear scan_data; 
+    Dq.goHome();  % Set the both channel to zero voltage
+    Camera.IsLiveON == true;  % Camera live is on
+    disp('Scan is finished.....');
+end       

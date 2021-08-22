@@ -154,4 +154,19 @@ NKTPLaser.stMethod(arg);
 
 
 
+%%%% The scanPattern class
+classdef scanPattern
+import DevicePack.*
+import DevicePack.scanPattern.*
+
+% Call package function
+z = pkfcn(x,y);
+
+% Creation class object
+obj=scanPattern(arg);
+
+% Call class object method
+obj.myMethod(arg);
+% Of the static method of the class
+scanPattern.stMethod(arg);
 
