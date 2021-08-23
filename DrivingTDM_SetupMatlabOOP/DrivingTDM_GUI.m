@@ -13,13 +13,13 @@ clear all
 % % Camera.setROI(528, 512);
 
 %%% Connect the photon focus camera
-Camera = DevicePack.camPhotonFocus;
+% % Camera = DevicePack.camPhotonFocus;
 
 
 
 %%% 
-%  Camera = DevicePack.CameraPcoPanda;
-%  Camera.setROI(1024, 1024);
+ Camera = DevicePack.CameraPcoPanda;
+ Camera.setROI(1024, 1024);
  
  
  %%% The Laser
@@ -416,7 +416,7 @@ ChannelYSlider.Limits = [Dq.minVoltChannelY  Dq.maxVoltChannelY];
 
 
 % DEFAULT  button
-DacGoHomeButton = uibutton(DacPanel,'state');
+DacGoHomeButton = uibutton(DacPanel);
 DacGoHomeButton.Text = 'DEFAULT'; DacGoHomeButton.FontWeight = 'bold'; DacGoHomeButton.FontSize = TextFontSize;
 HeightStart = DacPanelHeight - 2*TextHeight - 8*SpaceSize;
 WidthStart = CommandWidth - 9.7*TextHeight;
@@ -540,7 +540,7 @@ set(ChannelXValue,'ValueChangedFcn',@(src,event) SetDacChXvolt(Dq, ChannelXSlide
 set(ChannelXSlider,'ValueChangedFcn',@(src,event) SetDacChXvolt(Dq, ChannelXSlider, ChannelXValue, ChannelXSlider.Value));
 set(ChannelYValue,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue,  ChannelYValue.Value));
 set(ChannelYSlider,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue, ChannelYSlider.Value));
-set(DacGoHomeButton,'ValueChangedFcn',@(src,event) SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue, DacGoHomeButton.Value));
+set(DacGoHomeButton,'ButtonPushedFcn',@(DacGoHomeButton,event) SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue));
 
 
 % Acquisition
@@ -553,7 +553,6 @@ set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, ScanP
 %% Camera
 %%% The Live Button
 function CameraLive(Camera,CameraImage, CameraImageKspace, MaxIntensityValue,AvgIntensityValue,CameraLiveValue)
-   
     if CameraLiveValue == 1
         Camera.IsLiveON = true;
         img = (Camera.getImageFrame())';
@@ -572,7 +571,6 @@ function CameraLive(Camera,CameraImage, CameraImageKspace, MaxIntensityValue,Avg
             avg_intensity = floor(sum(sum(img))/(size(img,1)*size(img,2)));
             AvgIntensityValue.Value = double(avg_intensity);   %% Display the average intensity 
             MaxIntensityValue.Value = double((max(max(img)))); %% Display the maximum intensity
-
         end
         Camera.StopCapture();
         
@@ -641,14 +639,12 @@ function SetDacChYvolt(Dq, ChannelYSlider, ChannelYValue, voltage)
 end
 
 %%% set the Dac to default (both channel voltage is set to 0 volt)
-function SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue, Value)
-    if(Value == 1)
+function SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue)
         Dq.goHome();
         ChannelXSlider.Value = 0;
         ChannelXValue.Value =  0;
         ChannelYSlider.Value = 0;
         ChannelYValue.Value =  0;
-    end
 end
 
 

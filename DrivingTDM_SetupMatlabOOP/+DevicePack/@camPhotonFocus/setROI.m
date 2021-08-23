@@ -20,9 +20,9 @@ function obj = setROI(obj, width, height)
                     case  1312
                         obj.readoutTime = 14.59; %% Found from Camera manual
                     case 1024
-                        obj.readoutTime = 5.43;
+                        obj.readoutTime = 10.00;
                     otherwise
-                        obj.readoutTime = 3.00;
+                        obj.readoutTime = 5.60;
                 end
                     
                 

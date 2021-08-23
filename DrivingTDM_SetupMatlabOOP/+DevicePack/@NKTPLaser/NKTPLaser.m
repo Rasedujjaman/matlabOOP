@@ -101,6 +101,7 @@ classdef NKTPLaser < handle
             if not(libisloaded('NKTPDLL'))
                 loadlibrary('NKTPDLL');
             end
+
             
             %% Setting the COM port for the LASER Module
             %%% Scan all the possible COM Ports 
