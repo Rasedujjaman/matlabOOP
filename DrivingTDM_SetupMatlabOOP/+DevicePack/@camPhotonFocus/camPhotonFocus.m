@@ -45,7 +45,9 @@ classdef camPhotonFocus < handle
         sensorWidthActive = 1312       %% sensor width
         sensorHeightActive = 1082     %% sensor height 
        
-        exposuretime = 10; % Exposure Time (the default value)
+        exposuretime = 10; % Exposure Time (the default value is 10ms)
+        readoutTime = 14.59; % Readout Time (the default value is 14.59ms)
+        
         IsLiveON = 1;
         pixelFormat = 'Mono8'; %% the default pixel format
         packetDelayTime   %% packet delay time
@@ -153,6 +155,9 @@ classdef camPhotonFocus < handle
          
         %%% getting the exposure time of the camera
         obj = getExposureTime(obj);
+        
+        %%% Get the readout time
+        obj = getReadoutTime(obj);
         
         %%%%%%% Getting the Current ROI
         stringROI = getROI(obj);

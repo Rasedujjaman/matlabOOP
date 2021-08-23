@@ -14,6 +14,18 @@ function obj = setROI(obj, width, height)
                 obj.sensorHeightActive = height;
 
                 disp('ROI is set properly')
+                
+                %%% Update Readout Time(Readout time is related to ROI)
+                switch (obj.sensorWidthActive)
+                    case  1312
+                        obj.readoutTime = 14.59; %% Found from Camera manual
+                    case 1024
+                        obj.readoutTime = 5.43;
+                    otherwise
+                        obj.readoutTime = 3.00;
+                end
+                    
+                
 
             else
                 disp('ROI not supported');

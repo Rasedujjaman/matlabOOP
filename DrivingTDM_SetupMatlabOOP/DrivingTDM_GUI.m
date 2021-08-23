@@ -13,13 +13,13 @@ clear all
 % % Camera.setROI(528, 512);
 
 %%% Connect the photon focus camera
-% % Camera = DevicePack.camPhotonFocus;
+Camera = DevicePack.camPhotonFocus;
 
 
 
 %%% 
- Camera = DevicePack.CameraPcoPanda;
- Camera.setROI(256, 256);
+%  Camera = DevicePack.CameraPcoPanda;
+%  Camera.setROI(1024, 1024);
  
  
  %%% The Laser
@@ -30,7 +30,7 @@ clear all
 
 
 %%%The SacnPattern
-SacnPattern = DevicePack.scanPattern();
+ScanPattern = DevicePack.scanPattern();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% The file path where the data will be stored
@@ -472,7 +472,7 @@ textScanPatternDropDown.FontColor = 'blue';
 
 % Sleep time drop down menue
 SleepTimeDropDown = uidropdown(AcquisitionPanel);
-SleepTimeDropDown.Items = {'Not selected','0.00','0.02','0.05','0.10', '0.20', '0.30'};
+SleepTimeDropDown.Items = {'0.10', '0.20', '0.30', '0.40', '0.50'};
 SleepTimeDropDown.FontColor = 'blue';
 
 WidthStart = CommandWidth - 9*TextHeight-SpaceSize;
@@ -546,8 +546,8 @@ set(DacGoHomeButton,'ValueChangedFcn',@(src,event) SetDacDefault(Dq, ChannelXSli
 % Acquisition
 % The snapbutton
 set(SnapshotButton,'ButtonPushedFcn', @(SnapshotButton,event) getOneImage(Camera, SnapFilePath));
-set(ScanPatternDropDown,'ValueChangedFcn',@(ScanPatternDropDown, event) ChoseScanPattern(ScanPattern, ScanPatternDropDown.Value));
-set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown.Value));
+set(ScanPatternDropDown,'ValueChangedFcn',@(ScanPatternDropDown, event) ChoseScanPattern(ScanPattern, ScanPatternDropDown));
+set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown));
 
 
 %% Camera
@@ -670,7 +670,7 @@ end
 
 %%% The selection of scan pattern
 
-function ChoseScanPattern(ScanPattern, ScanPatternDropDown.Value)
+function ChoseScanPattern(ScanPattern, ScanPatternDropDown)
 switch(ScanPatternDropDown.Value)
 case 'Raster type'
    ScanPattern.rasterScanPattern();
@@ -689,7 +689,7 @@ end
 
 
 %%% The scan function 
-function performScan(Camera, ScanPattern, Dq, ScanFilePath, sleep_time)
+function performScan(Camera, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown)
 
  if(Camera.IsLiveON == true)
      Camera.IsLiveON = false;
@@ -711,13 +711,16 @@ disp('Scaning started.....');
      scan_data = repmat(temp_data, [1, 1, sz_stack]);
      
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% Calculate the pause time
+     sleepTime = str2double(SleepTimeDropDown.Value);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     for ii = 1:size(voltage_ch0_scan,1)
             
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%% set the channel voltage
         %%%%%%%%%%%%%%%%%%%% Writing the voltage to the output channel 
         Dq.putVoltage(voltage_ch0_scan(ii), voltage_ch1_scan(ii));
-        pause(sleep_time); % sleep time to settle the galvano mirrors
+        pause(sleepTime); % sleep time to settle the galvano mirrors
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         scan_data(:,:,ii) = Camera.getImageFrame(); 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
@@ -728,6 +731,6 @@ disp('Scaning started.....');
     save( fullfile(FileName),'scan_data')
     clear scan_data; 
     Dq.goHome();  % Set the both channel to zero voltage
-    Camera.IsLiveON == true;  % Camera live is on
+    Camera.IsLiveON = true;  % Camera live is on
     disp('Scan is finished.....');
 end       
