@@ -8,7 +8,7 @@ close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Test the motor 
 motorAxis1 = DevicePack.StandaMotor();   %% instantiation of the motor object
-motorAxis1.initializeDevices();
+
 %% Get the devices ids
 motorAxis1.getDevicesId();
 
@@ -98,3 +98,8 @@ laser.setPowerLevel(50);  %% set the power level to 50 percent
 %% Turn OFF the LASER
 laser.closeDevices();
 
+
+
+
+%%
+Data = DevicePack.SaveData;

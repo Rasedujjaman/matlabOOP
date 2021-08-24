@@ -31,6 +31,11 @@ clear all
 
 %%%The SacnPattern
 ScanPattern = DevicePack.scanPattern();
+
+
+%%% The Rotor
+Rotator = DevicePack.StandaMotor();   %% The Rotator
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% The file path where the data will be stored
@@ -445,7 +450,7 @@ AcquisitionPanel.Title = 'ACQUISITION'; AcquisitionPanel.TitlePosition = 'center
 
 % Scan pattern drop down menue
 ScanPatternDropDown = uidropdown(AcquisitionPanel);
-ScanPatternDropDown.Items = {'No pattern selected','Raster type','Snake motion type','Circular type','Spiral type'};
+ScanPatternDropDown.Items = {'No pattern selected','Raster type','Snake motion type','Circular type','Spiral type', 'Circular(TIR)'};
 ScanPatternDropDown.FontColor = 'blue';
 
 WidthStart = CommandWidth - 5*TextHeight;
@@ -472,7 +477,7 @@ textScanPatternDropDown.FontColor = 'blue';
 
 % Sleep time drop down menue
 SleepTimeDropDown = uidropdown(AcquisitionPanel);
-SleepTimeDropDown.Items = {'0.10', '0.20', '0.30', '0.40', '0.50'};
+SleepTimeDropDown.Items = {'0.10', '0.20', '0.30', '0.40', '0.50', '1.00', '2.00', '5.00'};
 SleepTimeDropDown.FontColor = 'blue';
 
 WidthStart = CommandWidth - 9*TextHeight-SpaceSize;
@@ -547,7 +552,7 @@ set(DacGoHomeButton,'ButtonPushedFcn',@(DacGoHomeButton,event) SetDacDefault(Dq,
 % The snapbutton
 set(SnapshotButton,'ButtonPushedFcn', @(SnapshotButton,event) getOneImage(Camera, SnapFilePath));
 set(ScanPatternDropDown,'ValueChangedFcn',@(ScanPatternDropDown, event) ChoseScanPattern(ScanPattern, ScanPatternDropDown));
-set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown));
+set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, Rotator, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown));
 
 
 %% Camera
@@ -676,7 +681,10 @@ case 'Circular type'
    ScanPattern.circularScanPattern();
 case 'Spiral type'
    ScanPattern.spiralScanPattern();
-
+case 'Circular(TIR)'
+   ScanPattern.circularTIR();  
+   
+   
 otherwise
    fprintf('Invalid scan pattern\n' );
 end
@@ -685,7 +693,7 @@ end
 
 
 %%% The scan function 
-function performScan(Camera, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown)
+function performScan(Camera, Rotator, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown)
 
  if(Camera.IsLiveON == true)
      Camera.IsLiveON = false;
@@ -698,8 +706,12 @@ disp('Scaning started.....');
 	Dq.goHome();  % Set the both channel to zero voltage
 	voltage_ch0_scan = ScanPattern.voltage_ch0_scan;
 	voltage_ch1_scan = ScanPattern.voltage_ch1_scan;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+%%% The Rotator
+phi = ScanPattern.getPhiValue();
+phiStep = phi(2) - phi(1);
+Rotator.goHome();
+pause(5);    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %%%% to alocate the momery
      sz_stack = size(voltage_ch0_scan, 1);
@@ -716,6 +728,8 @@ disp('Scaning started.....');
         %%% set the channel voltage
         %%%%%%%%%%%%%%%%%%%% Writing the voltage to the output channel 
         Dq.putVoltage(voltage_ch0_scan(ii), voltage_ch1_scan(ii));
+        
+        Rotator.rotationRelative(phiStep);
         pause(sleepTime); % sleep time to settle the galvano mirrors
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         scan_data(:,:,ii) = Camera.getImageFrame(); 

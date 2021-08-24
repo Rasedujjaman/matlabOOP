@@ -54,6 +54,10 @@ classdef StandaMotor < handle
             
             % %% add the path to load the built in matlab functions provided by Standa
              addpath(fullfile(pwd,'headerAndFunctionsMotor/builtInMotorFunctions/'));
+             
+             %%% Initialize device
+             
+             initializeDevices(obj);
             
         end 
         

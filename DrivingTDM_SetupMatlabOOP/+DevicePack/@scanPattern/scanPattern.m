@@ -24,6 +24,8 @@ classdef scanPattern  < handle
         radiusSpiral = 2.25;  % max value of channel#0 
         
         
+        %% Properties for Circular(TIR) scan pattern
+        phiOutMost;
         %%  These voltage will be supplied to the Dac
         voltage_ch0_scan 
         voltage_ch1_scan 
@@ -40,19 +42,29 @@ classdef scanPattern  < handle
             
         end
 
-        %% Function prototype to generate raster scan type pattern
+        %%% Function prototype to generate raster scan type pattern
         obj = rasterScanPattern(obj);
         
-        %% Function prototype to generate snake movement type pattern
+        %%% Function prototype to generate snake movement type pattern
         obj = snakeMovemnetScanPattern(obj);
         
-        %% Function prototype to generate concentric circular scan type pattern
+        %%% Function prototype to generate concentric circular scan type pattern
         obj = circularScanPattern(obj);
         
         
-        %% Function prototype to generate concentric spiral scan type pattern
+        %%% Function prototype to generate concentric spiral scan type pattern
         obj = spiralScanPattern(obj);
-
+        
+        %%% Function prototype to generate Circular (TIR) pattern
+        obj = circularTIR(obj);
+        
+        
+        %%% Function prototype to get the phi value for Circular(TIR)
+        %%% pattern
+        
+        phiOutmost = getPhiValue(obj);
+        
+        
         
         
     end

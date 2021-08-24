@@ -170,3 +170,21 @@ obj.myMethod(arg);
 % Of the static method of the class
 scanPattern.stMethod(arg);
 
+
+
+
+%%%% SaveData class
+classdef SaveData
+import DevicePack.*
+import DevicePack.SaveData.*
+
+% Call package function
+z = pkfcn(x,y);
+
+% Creation class object
+obj=SaveData(arg);
+
+% Call class object method
+obj.myMethod(arg);
+% Of the static method of the class
+SaveData.stMethod(arg);
