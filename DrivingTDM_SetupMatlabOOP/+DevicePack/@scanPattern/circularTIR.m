@@ -2,7 +2,7 @@
 function circularTIR(obj)
 
 
-        radius = obj.radiusCircle;
+        radius = obj.radiusCircleTIR;
         no_circle = 5;
         r_step = radius/no_circle;
         r = radius:-r_step:0;

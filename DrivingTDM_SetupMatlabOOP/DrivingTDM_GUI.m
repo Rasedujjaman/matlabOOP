@@ -36,23 +36,8 @@ ScanPattern = DevicePack.scanPattern();
 %%% The Rotor
 Rotator = DevicePack.StandaMotor();   %% The Rotator
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% The file path where the data will be stored
-TodaysDataFolder = datestr(now, 'ddmmyyyy');
-
-if  ~(isfolder(['E:\DataAcquisition\Snapshot\', TodaysDataFolder]))
-    mkdir(['E:\DataAcquisition\Snapshot\', TodaysDataFolder]);
-end
-
-SnapFilePath = ['E:\DataAcquisition\Snapshot\', TodaysDataFolder, '\'] ;
-
-if  ~(isfolder(['E:\DataAcquisition\Scan\', TodaysDataFolder]))
-    mkdir(['E:\DataAcquisition\Scan\', TodaysDataFolder]);
-end
-
-ScanFilePath = ['E:\DataAcquisition\Scan\', TodaysDataFolder, '\'];
-
+%%% For data saving 
+Data = DevicePack.SaveData;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %% Size of the computer screen. The programm assumes a 16:9 ratio
@@ -503,23 +488,75 @@ textSleepTimeDropDown.FontColor = 'blue';
 % Scan  button
 ScanButton = uibutton(AcquisitionPanel);
 ScanButton.Text = 'SCAN'; ScanButton.FontWeight = 'bold'; ScanButton.FontSize = TextFontSize;
-
 HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
 WidthStart  = CommandWidth - 12.4*TextHeight + SpaceSize;
-
 ScanButton.Position=[WidthStart HeightStart  5*TextFontSize TextHeight]; 
 ScanButton.FontColor = 'blue';
 
+% ScanCounter (numeric edit field)
+ScanCounter = uieditfield(AcquisitionPanel,'numeric');
+HeightStart = HeightStart + 1.5*TextHeight;
+ScanCounter.Position=[WidthStart+ TextFontSize  HeightStart  3*TextFontSize TextHeight]; 
+ScanCounter.ValueDisplayFormat = '%3d';
+ScanCounter.Value =  str2double(Data.ScanCounter); %% The initial value 
+ScanCounter.FontWeight = 'bold'; ScanCounter.FontSize = TextFontSize;
+ScanCounter.FontColor = 'blue';
+
+
+% Text Counter
+textCounter = uilabel(AcquisitionPanel);
+
+textCounter.Text = 'COUNTERS'; 
+textCounter.FontWeight = 'bold';
+textCounter.FontSize = TextFontSize;
+
+HeightStart = HeightStart + TextHeight;
+WidthStart  = CommandWidth - 14*TextHeight - SpaceSize;
+
+textCounter.Position=[WidthStart  HeightStart 6*TextFontSize TextHeight]; 
 
 % Snapshot  button
 SnapshotButton = uibutton(AcquisitionPanel);
 SnapshotButton.Text = 'SNAPSHOT'; SnapshotButton.FontWeight = 'bold'; SnapshotButton.FontSize = TextFontSize;
-
 HeightStart = AcquisitionPanelHeight - 6.8*TextHeight;
 WidthStart  = CommandWidth - 16*TextHeight + SpaceSize;
-
 SnapshotButton.Position=[WidthStart HeightStart  6*TextFontSize TextHeight]; 
 SnapshotButton.FontColor = [0.4660 0.6740 0.1880];
+
+% SnapCounter value (numeric edit field)
+SnapCounter = uieditfield(AcquisitionPanel,'numeric');
+HeightStart = HeightStart + 1.5*TextHeight;
+SnapCounter.Position=[WidthStart+1.5*TextFontSize  HeightStart  3*TextFontSize TextHeight]; 
+SnapCounter.ValueDisplayFormat = '%3d';
+SnapCounter.Value = str2double(Data.SnapShotCounter); %% The initial value 
+SnapCounter.FontWeight = 'bold'; SnapCounter.FontSize = TextFontSize;
+SnapCounter.FontColor = [0.4660 0.6740 0.1880];
+
+
+
+
+
+
+% Save folder path
+
+SaveFolderDisplay = uieditfield(AcquisitionPanel);
+WidthStart  = CommandWidth - 16*TextHeight + SpaceSize;
+HeightStart = AcquisitionPanelHeight - 2.5*TextHeight;
+SaveFolderLength = CommandWidth-2*SpaceSize-4*TextFontSize;
+SaveFolderDisplay.Position = [WidthStart HeightStart SaveFolderLength TextHeight];
+SaveFolderDisplay.Value = Data.FolderPath; SaveFolderDisplay.FontSize = TextFontSize;
+SaveFolderDisplay.Editable = 'off'; 
+
+% Save folder button
+
+WidthStart = WidthStart+SaveFolderLength;
+% Button "Choose folder"
+SaveFolderButton = uibutton(AcquisitionPanel);
+SaveFolderButton.Text = ''; 
+SaveFolderButton.Icon = fullfile([pwd, '\headerAndFunctionsSaveData'], 'Folder.jpg');
+SaveFolderButton.Position=[WidthStart HeightStart CommandWidth-SaveFolderLength-7*SpaceSize  TextHeight]; 
+
+
 
 
 %% All actions are implemented here
@@ -548,11 +585,14 @@ set(ChannelYSlider,'ValueChangedFcn',@(src,event) SetDacChYvolt(Dq, ChannelYSlid
 set(DacGoHomeButton,'ButtonPushedFcn',@(DacGoHomeButton,event) SetDacDefault(Dq, ChannelXSlider, ChannelYSlider, ChannelXValue, ChannelYValue));
 
 
-% Acquisition
+%%% Acquisition
 % The snapbutton
-set(SnapshotButton,'ButtonPushedFcn', @(SnapshotButton,event) getOneImage(Camera, SnapFilePath));
+set(SnapshotButton,'ButtonPushedFcn', @(SnapshotButton,event) getOneImage(Camera, Data, SnapCounter));
+% The scan
 set(ScanPatternDropDown,'ValueChangedFcn',@(ScanPatternDropDown, event) ChoseScanPattern(ScanPattern, ScanPatternDropDown));
-set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, Rotator, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown));
+set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, Rotator, ScanPattern, Dq, SleepTimeDropDown, Data, ScanCounter));
+% Chose folder to save data
+set(SaveFolderButton,'ButtonPushedFcn',@(src,event) ChooseSaveFolder(SaveFolderDisplay, Data, ScanCounter, SnapCounter));
 
 
 %% Camera
@@ -655,17 +695,24 @@ end
 
 %% Aquistion
 %%% The snapshot button
-function getOneImage(Camera,SnapFilePath)
+function getOneImage(Camera, Data, SnapCounter)
     %%% Check if the camera is live, if live is on turn it off before the image snap
     if(Camera.IsLiveON == true)
      Camera.IsLiveON = false;
     end
    
-    FileName = [SnapFilePath,'Snap',datestr(now,'ddmmyyyyHHMMSS')];
+    %%% Update the Snap Counter value
+    Data.IncrementCounter('SnapShotCounter');
+    
+    FileName = [Data.FolderPath, Data.SnapFileNameFirstPart, ...
+        datestr(now,'yyyymmdd'),'_', Data.SnapShotCounter];
+    
     img = (Camera.getImageFrame())';
     save( fullfile(FileName),'img');
     %save FileName img_snap_one;
     disp('Snap is taken');
+    %%% Update the counter display
+    SnapCounter.Value = str2double(Data.SnapShotCounter);
     Camera.IsLiveON = true;  % Turn on the camera live again
 end
 
@@ -693,7 +740,7 @@ end
 
 
 %%% The scan function 
-function performScan(Camera, Rotator, ScanPattern, Dq, ScanFilePath, SleepTimeDropDown)
+function performScan(Camera, Rotator, ScanPattern, Dq, SleepTimeDropDown, Data, ScanCounter)
 
  if(Camera.IsLiveON == true)
      Camera.IsLiveON = false;
@@ -711,7 +758,7 @@ disp('Scaning started.....');
 phi = ScanPattern.getPhiValue();
 phiStep = phi(2) - phi(1);
 Rotator.goHome();
-pause(5);    
+pause(2);    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %%%% to alocate the momery
      sz_stack = size(voltage_ch0_scan, 1);
@@ -737,10 +784,39 @@ pause(5);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
     timeElapsed = toc  % to display the total time elapsed 
-    FileName = [ScanFilePath,'scan',datestr(now,'ddmmyyyyHHMMSS')];
+    
+    
+ %%% Update the Snap Counter value
+    Data.IncrementCounter('ScanCounter');
+    FileName = [Data.FolderPath, Data.ScanFileNameFirstPart, ...
+        datestr(now,'yyyymmdd'),'_', Data.ScanCounter];
+    
     save( fullfile(FileName),'scan_data')
     clear scan_data; 
     Dq.goHome();  % Set the both channel to zero voltage
+    
+    ScanCounter.Value = str2double(Data.ScanCounter);
     Camera.IsLiveON = true;  % Camera live is on
     disp('Scan is finished.....');
 end       
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Chose the folder where the data will be stored
+
+function ChooseSaveFolder(SaveFolder, Data, ScanCounter, SnapCounter)
+    SaveFolder.Value = uigetdir(SaveFolder.Value);
+    Data.RootFolderPath = strcat(SaveFolder.Value, '\');
+    Data.SetFolderPath();
+    fileID = fopen(fullfile([pwd, '\headerAndFunctionsSaveData'], 'RootFolderPath.txt'),'w');
+    fprintf(fileID,'%s', Data.RootFolderPath);
+    fclose(fileID);
+    SaveFolder.Value = Data.FolderPath;
+    %%%% Once diffierent directory is chosen to store data 
+    %%% The counter values should be set to zero
+    Data.ResetCounter('ScanCounter');
+    Data.ResetCounter('SnapShotCounter');
+    SnapCounter.Value = 0;
+    ScanCounter.Value = 0;
+    
+end

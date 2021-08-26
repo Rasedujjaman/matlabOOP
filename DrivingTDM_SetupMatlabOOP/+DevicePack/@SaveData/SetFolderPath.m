@@ -15,9 +15,9 @@ function SetFolderPath(obj)
     else
 
         obj.FolderPath = fullfile(strcat(obj.RootFolderPath, obj.FolderName, '\'));
-% %         if ~exist(obj.FolderPath)
-% %             mkdir(obj.FolderPath)
-% %         end
+        if ~isfolder(obj.FolderPath)
+            mkdir(obj.FolderPath)
+        end
         disp('Folder path is set properly');
     end
 

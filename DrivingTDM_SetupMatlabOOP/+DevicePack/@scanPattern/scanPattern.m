@@ -26,6 +26,7 @@ classdef scanPattern  < handle
         
         %% Properties for Circular(TIR) scan pattern
         phiOutMost;
+        radiusCircleTIR = 2.60;
         %%  These voltage will be supplied to the Dac
         voltage_ch0_scan 
         voltage_ch1_scan 
