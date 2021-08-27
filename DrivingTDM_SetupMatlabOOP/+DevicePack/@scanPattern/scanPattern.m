@@ -15,6 +15,9 @@ classdef scanPattern  < handle
         sval_ch1_min = -2;
         sval_ch1_max = 2;  
         
+        %% Correction voltage for the normal incidence
+        sval_offset_ch0 = 0.17;
+        sval_offset_ch1 = - 0.15;
         
         %% Properties for Circular scan pattern
         radiusCircle = 2.30; % max value of channel#0  %% to make the outer circle closer to the numerical edge
@@ -26,7 +29,8 @@ classdef scanPattern  < handle
         
         %% Properties for Circular(TIR) scan pattern
         phiOutMost;
-        radiusCircleTIR = 2.60;
+        radiusCircleTIR = 2.50;
+        phiStepSize = 30;
         %%  These voltage will be supplied to the Dac
         voltage_ch0_scan 
         voltage_ch1_scan 

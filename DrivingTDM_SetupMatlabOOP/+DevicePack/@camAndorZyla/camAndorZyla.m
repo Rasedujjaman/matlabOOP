@@ -11,7 +11,6 @@ classdef camAndorZyla < handle
         
         SensorWidth  = 2560;
         SensorHeight = 2160;
-        
         ExpoTimeMax  = 50;  %% Maximum permissible exposure time in (ms)
         
         
@@ -19,7 +18,7 @@ classdef camAndorZyla < handle
     
     
     
-    properties (Access = private)
+    properties (Access = public)
         
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%% ROI parameters
@@ -30,18 +29,21 @@ classdef camAndorZyla < handle
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-        imageSize       %% image size in byte
+       
         stride          %% This value is used by the function AT_ConvertMono16ToMatrix
         exposuretime = 0.01;  %% exposure time of the camera (default is set to 10ms)
+        ReadoutTime
+        
+        CameraName = 'AndorZyla';
+        CameraModel = 'Zyla 5.5 sCMOS';
+        hndl    %% the camera handle 
+        Image;  %% The captured image
+        imageSize       %% image size in byte
+        IsLiveON = 0; 
+        
        
     end
     
-    properties (Access = public)
-    
-        hndl    %% the camera handle 
-        Image;  %% The captured image
-        IsLiveON = 0; 
-    end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -118,11 +120,12 @@ classdef camAndorZyla < handle
         
         
         %%% getting the exposure time of the camera
-         obj = getExposureTime(obj);
-       
-        
+        obj = getExposureTime(obj);
+        %%% getting the ReadoutTime of the camera
+        obj = getReadoutTime(obj);
+
         %%% getting the image Frame width
-         obj = getImageWidth(obj);
+        obj = getImageWidth(obj);
        
         
         

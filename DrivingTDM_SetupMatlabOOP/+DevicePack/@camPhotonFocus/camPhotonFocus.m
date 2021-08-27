@@ -51,6 +51,7 @@ classdef camPhotonFocus < handle
         IsLiveON = 1;
         pixelFormat = 'Mono8'; %% the default pixel format
         packetDelayTime   %% packet delay time
+        CameraName = 'PhotonFocus';
     
     end
     

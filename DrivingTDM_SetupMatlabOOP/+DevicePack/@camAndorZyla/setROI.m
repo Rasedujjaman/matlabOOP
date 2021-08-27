@@ -5,8 +5,7 @@
 %%% give you the supported ROI for this specific camera
 
 function obj = setROI(obj, width, height)
-            [rc] = AT_Command(obj.hndl,'AcquisitionStop');
-            AT_CheckWarning(rc);
+           
             
             if(width == 2560 && height == 2160)
                 obj.left = 1; 
@@ -36,12 +35,13 @@ function obj = setROI(obj, width, height)
                 disp([num2str(2560), ' X ', num2str(2160)]);
                 disp([num2str(1392), ' X ', num2str(1040)]);
                 disp([num2str(528), ' X ', num2str(512)]);
-            
+                return;
           
             end
             
               %%% Set the ROI with new values
-            
+            [rc] = AT_Command(obj.hndl,'AcquisitionStop');
+            AT_CheckWarning(rc);
             [rc] = AT_SetInt(obj.hndl,'AOIWidth',width);
             AT_CheckWarning(rc);
             [rc] = AT_SetInt(obj.hndl,'AOILeft',obj.left);

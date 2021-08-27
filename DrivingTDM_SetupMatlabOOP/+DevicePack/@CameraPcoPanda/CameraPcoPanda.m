@@ -41,6 +41,7 @@ classdef CameraPcoPanda < handle
         Image;    %%% Store the image captured
         IsLiveON = 0;
         IsCaptureON = 0;
+        CameraName = 'PCO.PANDA';
         
       end
       

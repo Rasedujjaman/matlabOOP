@@ -15,8 +15,6 @@ clear all
 %%% Connect the photon focus camera
 % % Camera = DevicePack.camPhotonFocus;
 
-
-
 %%% 
  Camera = DevicePack.CameraPcoPanda;
  Camera.setROI(1024, 1024);
@@ -460,6 +458,17 @@ HeightStart1 = HeightStart + 5*SpaceSize;
 textScanPatternDropDown.Position=[WidthStart+SpaceSize  HeightStart1 4.6*TextHeight TextHeight]; 
 textScanPatternDropDown.FontColor = 'blue';
 
+% Button Close all devices
+CloseAllDevicesButton = uibutton(AcquisitionPanel);
+CloseAllDevicesButton.Text = 'CLOSE DEVICES'; CloseAllDevicesButton.FontWeight = 'bold'; 
+CloseAllDevicesButton.FontSize = 14; CloseAllDevicesButton.FontColor = 'red';
+HeightStart1 = HeightStart1 + 8*SpaceSize;
+CloseAllDevicesButton.Position=[WidthStart HeightStart1  ScanPatternDropDownWidth TextHeight]; 
+
+
+
+
+
 % Sleep time drop down menue
 SleepTimeDropDown = uidropdown(AcquisitionPanel);
 SleepTimeDropDown.Items = {'0.10', '0.20', '0.30', '0.40', '0.50', '1.00', '2.00', '5.00'};
@@ -590,10 +599,12 @@ set(DacGoHomeButton,'ButtonPushedFcn',@(DacGoHomeButton,event) SetDacDefault(Dq,
 set(SnapshotButton,'ButtonPushedFcn', @(SnapshotButton,event) getOneImage(Camera, Data, SnapCounter));
 % The scan
 set(ScanPatternDropDown,'ValueChangedFcn',@(ScanPatternDropDown, event) ChoseScanPattern(ScanPattern, ScanPatternDropDown));
-set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, Rotator, ScanPattern, Dq, SleepTimeDropDown, Data, ScanCounter));
+set(ScanButton ,'ButtonPushedFcn', @(ScanButton,event) performScan(Camera, Rotator, ScanPattern, Dq, SleepTimeDropDown,...
+    ScanPatternDropDown, Data, ScanCounter));
 % Chose folder to save data
 set(SaveFolderButton,'ButtonPushedFcn',@(src,event) ChooseSaveFolder(SaveFolderDisplay, Data, ScanCounter, SnapCounter));
-
+% Close all the devices
+set(CloseAllDevicesButton,'ButtonPushedFcn', @(CloseAllDevicesButton,event) closeAllDevices(Camera, Dq, Laser, Rotator));
 
 %% Camera
 %%% The Live Button
@@ -608,14 +619,14 @@ function CameraLive(Camera,CameraImage, CameraImageKspace, MaxIntensityValue,Avg
         h2 = imagesc(CameraImageKspace, (log10(abs(fftshift(fft2(img)))))); 
         
         while( Camera.IsLiveON == true)
-            
-            img = (Camera.getImageFrame())';
-            set(h,'CData', img);
-            set(h2,'CData',log10(abs(fftshift(fft2(img)))));
-            
-            avg_intensity = floor(sum(sum(img))/(size(img,1)*size(img,2)));
-            AvgIntensityValue.Value = double(avg_intensity);   %% Display the average intensity 
-            MaxIntensityValue.Value = double((max(max(img)))); %% Display the maximum intensity
+                img = (Camera.getImageFrame())';
+                set(h,'CData', img);
+                set(h2,'CData',log10(abs(fftshift(fft2(img)))));
+
+                avg_intensity = floor(sum(sum(img))/(size(img,1)*size(img,2)));
+                AvgIntensityValue.Value = double(avg_intensity);   %% Display the average intensity 
+                MaxIntensityValue.Value = double((max(max(img)))); %% Display the maximum intensity
+                drawnow
         end
         Camera.StopCapture();
         
@@ -707,8 +718,8 @@ function getOneImage(Camera, Data, SnapCounter)
     FileName = [Data.FolderPath, Data.SnapFileNameFirstPart, ...
         datestr(now,'yyyymmdd'),'_', Data.SnapShotCounter];
     
-    img = (Camera.getImageFrame())';
-    save( fullfile(FileName),'img');
+    img_snap = (Camera.getImageFrame())';
+    save( fullfile(FileName),'img_snap');
     %save FileName img_snap_one;
     disp('Snap is taken');
     %%% Update the counter display
@@ -740,7 +751,16 @@ end
 
 
 %%% The scan function 
-function performScan(Camera, Rotator, ScanPattern, Dq, SleepTimeDropDown, Data, ScanCounter)
+function performScan(Camera, Rotator, ScanPattern, Dq, SleepTimeDropDown,ScanPatternDropDown, Data, ScanCounter)
+%%% Check if a scan pattern is selected (if not this function will be
+%%% aborted)
+
+if(strcmp(ScanPatternDropDown.Value, 'No pattern selected'))
+    disp('No scan pattern is being selected!');
+    disp('Please select a scan pattern from the drop down menue');
+    return;
+end
+
 
  if(Camera.IsLiveON == true)
      Camera.IsLiveON = false;
@@ -776,7 +796,7 @@ pause(2);
         %%%%%%%%%%%%%%%%%%%% Writing the voltage to the output channel 
         Dq.putVoltage(voltage_ch0_scan(ii), voltage_ch1_scan(ii));
         
-        Rotator.rotationRelative(phiStep);
+        Rotator.rotationRelative(phiStep/2);
         pause(sleepTime); % sleep time to settle the galvano mirrors
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         scan_data(:,:,ii) = Camera.getImageFrame(); 
@@ -794,6 +814,7 @@ pause(2);
     save( fullfile(FileName),'scan_data')
     clear scan_data; 
     Dq.goHome();  % Set the both channel to zero voltage
+    Rotator.goHome();  % Set the rotator to zero position
     
     ScanCounter.Value = str2double(Data.ScanCounter);
     Camera.IsLiveON = true;  % Camera live is on
@@ -819,4 +840,27 @@ function ChooseSaveFolder(SaveFolder, Data, ScanCounter, SnapCounter)
     SnapCounter.Value = 0;
     ScanCounter.Value = 0;
     
+end
+
+
+%%% Close all the devices and GUI window
+function closeAllDevices(Camera, Dq, Laser, Rotator)
+
+% This close function only works when the camera live mode is off
+
+%%% Check if the camera is still in live mode
+    if(Camera.IsLiveON == 1)
+        disp('First stop the camera live mode, then close the devices');
+        return;
+    else
+
+    %%% Close all the devices 
+    Camera.closeDevices();
+    Dq.closeDevices();
+    Laser.closeDevices();
+    Rotator.closeDevices();
+
+
+    closereq();  %% Close the main GUI window
+    end
 end
