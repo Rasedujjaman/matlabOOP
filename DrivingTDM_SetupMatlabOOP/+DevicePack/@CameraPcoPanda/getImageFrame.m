@@ -7,7 +7,7 @@
 function outImageFrame = getImageFrame(obj)
 
     if (obj.IsCaptureON == 0)
-    StartCapture(obj);
+    startCapture(obj);
     end
 
     trigger(obj.vid);

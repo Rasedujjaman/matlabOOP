@@ -1,7 +1,6 @@
 
-classdef scanPattern  < handle
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+classdef ScanPattern  < handle
+
 
     properties (Access = public)
         %% Properties for Raster scan and Snake movement type 
@@ -38,11 +37,12 @@ classdef scanPattern  < handle
     end
 
     methods
-        function obj = scanPattern()
+        function obj = ScanPattern()
            
             
-            
-            
+           % Generate only one scan pattern when the object is created
+           
+            obj.snakeMovemnetScanPattern(); 
             
             
         end

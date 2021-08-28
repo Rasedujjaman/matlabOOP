@@ -9,16 +9,18 @@ clear all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Connect to the devices
 %%%Connect the AndorZyla camera
-% % Camera = DevicePack.camAndorZyla; 
+Camera = DevicePack.CameraAndorZyla; 
 % % Camera.setROI(528, 512);
 
 %%% Connect the photon focus camera
-% % Camera = DevicePack.camPhotonFocus;
+%%% Camera = DevicePack.CameraPhotonFocus;
 
 %%% 
- Camera = DevicePack.CameraPcoPanda;
- Camera.setROI(1024, 1024);
+% %  Camera = DevicePack.CameraPcoPanda;
+% %  Camera.setROI(1024, 1024);
  
+
+% % Camera = DevicePack.camPcoPanda;
  
  %%% The Laser
  Laser = DevicePack.NKTPLaser;
@@ -28,7 +30,7 @@ clear all
 
 
 %%%The SacnPattern
-ScanPattern = DevicePack.scanPattern();
+ScanPattern = DevicePack.ScanPattern();
 
 
 %%% The Rotor
@@ -76,8 +78,6 @@ Main.Resize = 'off';
 % % SensorSize = max(Camera.SensorWidth,Camera.SensorHeight); % Consider a full-size image from the camera
 width = Camera.getImageWidth();
 height = Camera.getImageHeight();
-
-
 
 % % Image = zeros(SensorSize,SensorSize);                               
 Image = zeros(width, height);
@@ -628,7 +628,7 @@ function CameraLive(Camera,CameraImage, CameraImageKspace, MaxIntensityValue,Avg
                 MaxIntensityValue.Value = double((max(max(img)))); %% Display the maximum intensity
                 drawnow
         end
-        Camera.StopCapture();
+        Camera.stopCapture();
         
     else
         Camera.IsLiveON = false;

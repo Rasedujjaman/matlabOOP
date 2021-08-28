@@ -57,66 +57,44 @@ Dac.stMethod(arg);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% The camAndorZyla class 
-classdef camAndorZyla
+%%%% The CameraAndorZyla class 
+classdef CameraAndorZyla
 import DevicePack.*
-import DevicePack.camAndorZyla.*
+import DevicePack.CameraAndorZyla.*
 
 % Call package function
 z = pkfcn(x,y);
 
 % Creation class object
-obj=camAndorZyla(arg);
+obj=CameraAndorZyla(arg);
 
 % Call class object method
 obj.myMethod(arg);
 % Of the static method of the class
-camAndorZyla.stMethod(arg);
+CameraAndorZyla.stMethod(arg);
 
 
 
-%%%% The camPcoPanda class 
-classdef camPcoPanda
+%%%% The CameraPhotonFocus class 
+classdef CameraPhotonFocus
 import DevicePack.*
-import DevicePack.camPcoPanda.*
+import DevicePack.CameraPhotonFocus.*
 
 % Call package function
 z = pkfcn(x,y);
 
 % Creation class object
-obj=camPcoPanda(arg);
+obj=CameraPhotonFocus(arg);
 
 % Call class object method
 obj.myMethod(arg);
 % Of the static method of the class
-camPcoPanda.stMethod(arg);
+CameraPhotonFocus.stMethod(arg);
 
 
 
 
-%%%% The camPcoPanda class 
-classdef camPcoPanda
-import DevicePack.*
-import DevicePack.camPcoPanda.*
-
-% Call package function
-z = pkfcn(x,y);
-
-% Creation class object
-obj=camPcoPanda(arg);
-
-% Call class object method
-obj.myMethod(arg);
-% Of the static method of the class
-camPcoPanda.stMethod(arg);
-
-
-
-
-
-
-
-%%%% The camPhotonFocus class 
+%%%% The CameraPcoPanda class 
 classdef CameraPcoPanda
 import DevicePack.*
 import DevicePack.CameraPcoPanda.*
@@ -131,10 +109,6 @@ obj=CameraPcoPanda(arg);
 obj.myMethod(arg);
 % Of the static method of the class
 CameraPcoPanda.stMethod(arg);
-
-
-
-
 
 %%%% The LASER source
 classdef NKTPLaser
@@ -155,20 +129,20 @@ NKTPLaser.stMethod(arg);
 
 
 %%%% The scanPattern class
-classdef scanPattern
+classdef ScanPattern
 import DevicePack.*
-import DevicePack.scanPattern.*
+import DevicePack.ScanPattern.*
 
 % Call package function
 z = pkfcn(x,y);
 
 % Creation class object
-obj=scanPattern(arg);
+obj=ScanPattern(arg);
 
 % Call class object method
 obj.myMethod(arg);
 % Of the static method of the class
-scanPattern.stMethod(arg);
+ScanPattern.stMethod(arg);
 
 
 
@@ -188,3 +162,22 @@ obj=SaveData(arg);
 obj.myMethod(arg);
 % Of the static method of the class
 SaveData.stMethod(arg);
+
+
+
+
+%%%% The camPcoPanda class 
+classdef camPcoPanda
+import DevicePack.*
+import DevicePack.camPcoPanda.*
+
+% Call package function
+z = pkfcn(x,y);
+
+% Creation class object
+obj=camPcoPanda(arg);
+
+% Call class object method
+obj.myMethod(arg);
+% Of the static method of the class
+camPcoPanda.stMethod(arg);

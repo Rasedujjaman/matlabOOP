@@ -1,7 +1,7 @@
 
 
 %% Capture many images, one by one but the image will not be returned in the matlab workspace
-function StartCapture(obj)
+function startCapture(obj)
 	if (obj.IsCaptureON == 0)
     % Tell the camera it will have to acquire many images
         obj.vid.TriggerRepeat = Inf;
@@ -15,6 +15,6 @@ function StartCapture(obj)
         obj.IsCaptureON = 1; 
     else
        disp('The Camera is already in capture mode'); 
-    end
+	end
 
 end

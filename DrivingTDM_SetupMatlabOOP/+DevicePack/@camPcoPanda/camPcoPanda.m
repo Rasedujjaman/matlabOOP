@@ -1,8 +1,12 @@
 classdef camPcoPanda  < handle
-    %CAMPCOPANDA Summary of this class goes here
-    %   Detailed explanation goes here
+   
+    %%%% This class implementation of pco.camera is based on the
+    %%% dll function as provided by the company
+    %%% It does not requres Matlab image aquisition toolbox
     
-     properties (Access = private)
+    
+    
+     properties (Constant = true)
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%% ROI parameters (see the description of ROI in the SKD of PCO camera)
@@ -27,7 +31,7 @@ classdef camPcoPanda  < handle
       
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
+        ExpoTimeMax = 5000;  % Maximum permissible exposure time in (ms)
         exposure_time = 10;  %% exposure time (default value 10ms)
         triggermode = 0;     %% default value
         
@@ -42,7 +46,6 @@ classdef camPcoPanda  < handle
         %glvar.do_close:     1 close camera SDK at end
         %glvar.camera_open:  open status of camera SDK
         %glvar.out_ptr:      libpointer to camera SDK handle
-        
         glvar=struct('do_libunload',0,'do_close',0,'camera_open',0,'out_ptr',[]); 
         out_ptr   %% the camera handle 
         IsLiveON = 0;  
@@ -187,6 +190,17 @@ classdef camPcoPanda  < handle
          %%% Get the triggermode
          obj = getTrigerMode(obj)
          
+         %%% Get the height of the camera sensor
+        obj = getSensorHeightMax(obj);
+        
+        %%% Get the width of the camera sensor
+        obj = getSensorWidthMax(obj);
+         
+         
+        
+        %%% Dummy function 
+        obj = stopCapture(obj);
+        
          %%% Function prototype for closing the devices
          closeDevices(obj);
         
