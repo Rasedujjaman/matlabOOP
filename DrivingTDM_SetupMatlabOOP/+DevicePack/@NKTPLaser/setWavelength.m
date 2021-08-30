@@ -36,6 +36,7 @@ function obj = setWavelength(obj, lambda)
             if (err1 == 0 && err2 == 0)
                 
                 obj.waveLength = lambda;  %% update the current wavelength
+                getRGBtriplet(obj);       %% update the RGB triplet values
                 disp('Wavelength is set properly');
             end 
 end

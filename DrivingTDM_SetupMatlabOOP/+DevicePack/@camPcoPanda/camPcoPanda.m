@@ -6,7 +6,7 @@ classdef camPcoPanda  < handle
     
     
     
-     properties (Constant = true)
+     properties (Access = public)
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%% ROI parameters (see the description of ROI in the SKD of PCO camera)
@@ -152,57 +152,57 @@ classdef camPcoPanda  < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
        
         
-        
-       
-        
-         %%% Setting the exposure time of the camera
-         obj = setExposureTime(obj, ExpoTime); %% Function prototype to set the exposure time
-         
- 
-         %%% Getting the exposure time
-         obj = getExposureTime(obj);
-        
-        
-        
-        %%% This function will return the image frame 
-        
-         obj = getImageFrame(obj);  %% function prototype for image capture
-        
-        
-         
-         %%% Getting Region of interest (ROI)
-         obj = getROI(obj)
-         
-         %%% getting the image Frame width
-         obj = getImageWidth(obj);
-       
-        
 
-       %%% getting the image Frame height
+
+
+        %%% Setting the exposure time of the camera
+        obj = setExposureTime(obj, ExpoTime); %% Function prototype to set the exposure time
+
+
+        %%% Getting the exposure time
+        obj = getExposureTime(obj);
+
+
+
+        %%% This function will return the image frame 
+
+        obj = getImageFrame(obj);  %% function prototype for image capture
+
+
+
+        %%% Getting Region of interest (ROI)
+        obj = getROI(obj)
+
+        %%% getting the image Frame width
+        obj = getImageWidth(obj);
+
+
+
+        %%% getting the image Frame height
         obj = getImageHeight(obj);
-         
-         
-         
-         
-         %%% Setting the Region of interest (ROI)
-         obj = setROI(obj, width, height);   %% Function prototype for setting the ROI
-         
-         %%% Get the triggermode
-         obj = getTrigerMode(obj)
-         
-         %%% Get the height of the camera sensor
+
+
+
+
+        %%% Setting the Region of interest (ROI)
+        obj = setROI(obj, width, height);   %% Function prototype for setting the ROI
+
+        %%% Get the triggermode
+        obj = getTrigerMode(obj)
+
+        %%% Get the height of the camera sensor
         obj = getSensorHeightMax(obj);
-        
+
         %%% Get the width of the camera sensor
         obj = getSensorWidthMax(obj);
-         
-         
-        
+
+
+
         %%% Dummy function 
         obj = stopCapture(obj);
-        
-         %%% Function prototype for closing the devices
-         closeDevices(obj);
+
+        %%% Function prototype for closing the devices
+        closeDevices(obj);
         
         
         

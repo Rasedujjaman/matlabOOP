@@ -72,7 +72,6 @@ classdef NKTPLaser < handle
     properties (Access = private)
         portName;          %% The COM port where the module is conneced
         powerLevel = 5;    %% present level of laser power(initial value is set to default) 
-        waveLength = 475;  %% the present wavelength of the LASER (initial value is set to default) 
         bandWidth  = 10;   %% the present spectral bandwidth (initial value is set to default) 
         
         
@@ -82,6 +81,13 @@ classdef NKTPLaser < handle
         isLaserON = 0;  %% This will indicates the status of the LASER
                         %%%  isLaserON = 0: Laser is in OFF state
                         %%%  isLaserON = 1: Laser is in ON state
+                        
+        waveLength = 475;  %% the present wavelength of the LASER (initial value is set to default) 
+        %%% The color Triplet
+        R
+        G
+        B
+        
     end
    
     
@@ -181,7 +187,7 @@ classdef NKTPLaser < handle
         
         obj = getDefaultParameters(obj); %% function prototype to display all the default parameters of the laser souce
         
-        
+        obj = getRGBtriplet(obj, lambda);  %% The function will generate RGB triplet depending on the wavelength
         
         %% Turn OFF the LASER
         obj = turnOFFdevice(obj);

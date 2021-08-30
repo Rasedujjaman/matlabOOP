@@ -23,7 +23,7 @@ function setROI(obj,Width,Height)
         %%% Check if the camera is in capture mode
         %%% When the camera is in capture, ROI can not be set
         if(obj.IsCaptureON == 1)
-            StopCapture(obj);  %% Stop the capture mode of the camera
+            stopCapture(obj);  %% Stop the capture mode of the camera
         end
 
         deltaX = floor(obj.SensorWidth - Width)/2;

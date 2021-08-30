@@ -1,7 +1,7 @@
 
 %%% Matlab GUI for driving the Tomographic diffractive microscopy(TDM)
 
-%%Clear all
+
 close all
 clear all
 
@@ -9,15 +9,15 @@ clear all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Connect to the devices
 %%%Connect the AndorZyla camera
-Camera = DevicePack.CameraAndorZyla; 
-% % Camera.setROI(528, 512);
+% % Camera = DevicePack.CameraAndorZyla; 
+
 
 %%% Connect the photon focus camera
 %%% Camera = DevicePack.CameraPhotonFocus;
 
-%%% 
-% %  Camera = DevicePack.CameraPcoPanda;
-% %  Camera.setROI(1024, 1024);
+%%%Connect the pco.panda camera
+ Camera = DevicePack.CameraPcoPanda;
+ Camera.setROI(1024, 1024);
  
 
 % % Camera = DevicePack.camPcoPanda;
@@ -37,7 +37,7 @@ ScanPattern = DevicePack.ScanPattern();
 Rotator = DevicePack.StandaMotor();   %% The Rotator
 
 %%% For data saving 
-Data = DevicePack.SaveData;
+Data = DevicePack.SaveData; % This handles the path where the data will be saved
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %% Size of the computer screen. The programm assumes a 16:9 ratio
@@ -277,24 +277,11 @@ HeightStart1 = LaserPanelHeight-2*TextHeight - 2*SpaceSize;
 WidthStart = SpaceSize;
 LaserOnOffButton.Position=[WidthStart HeightStart1 4.5*TextFontSize TextHeight]; 
 
-%
-HeightStart2 = HeightStart1 - 5*SpaceSize;
-% Laser power level
-% Text "Power"
-PowerLabel = uilabel(LaserPanel);
-PowerLabel.Position=[WidthStart HeightStart2 6*TextFontSize TextHeight];
-PowerLabel.Text = 'Power(%)'; PowerLabel.FontWeight = 'bold'; PowerLabel.FontSize = TextFontSize;
-PowerLabel.FontColor = [0.6350 0.0780 0.1840];
-HeightStart3 = HeightStart2 - 5*SpaceSize;
-
-
-%  Power level (numeric value)
-PowerValue = uieditfield(LaserPanel,'numeric');
-PowerValue.Position = [WidthStart HeightStart3  4.7*TextFontSize TextHeight];
-PowerValue.ValueDisplayFormat = '%d';
-PowerValue.Value = 5; PowerValue.FontWeight = 'bold'; PowerValue.FontSize = TextFontSize;
-PowerValue.Limits = [0 Laser.maxPowerLevel]; PowerValue.LowerLimitInclusive = 'on'; PowerValue.UpperLimitInclusive = 'on';
-
+% Lamp (indicating the wavelength)
+Lamp = uilamp(LaserPanel);
+HeightStart3 = HeightStart1 -  8*SpaceSize;
+Lamp.Position = [WidthStart+5*SpaceSize  HeightStart3  2*TextFontSize TextHeight];
+Lamp.Color = [0 0 0]; % The initial color is set to black
 
 % Text Wavelength
 % 
@@ -323,9 +310,30 @@ HeightStart1 = LaserPanelHeight-2*TextHeight - 2*SpaceSize;
 WidthStart = CommandWidth - 12.8*TextFontSize ;
 BandwidthLabel.Position=[WidthStart HeightStart1 7.5*TextFontSize TextHeight]; 
 
+% Laser power level
+% Text power level
+PowerLabel = uilabel(LaserPanel);
+WidthStart = CommandWidth - 5*TextFontSize ;
+PowerLabel.Position=[WidthStart HeightStart1 6*TextFontSize TextHeight];
+PowerLabel.Text = 'Power(%)'; PowerLabel.FontWeight = 'bold'; PowerLabel.FontSize = TextFontSize;
+PowerLabel.FontColor = [0.6350 0.0780 0.1840];
+
+HeightStart3 = HeightStart1 - 7*SpaceSize;
+
+%  Power level (numeric value)
+PowerValue = uieditfield(LaserPanel,'numeric');
+PowerValue.Position = [WidthStart HeightStart3  4.2*TextFontSize TextHeight];
+PowerValue.ValueDisplayFormat = '%d';
+PowerValue.Value = 5; PowerValue.FontWeight = 'bold'; PowerValue.FontSize = TextFontSize;
+PowerValue.Limits = [0 Laser.maxPowerLevel]; PowerValue.LowerLimitInclusive = 'on'; PowerValue.UpperLimitInclusive = 'on';
+
+
+
+
+
 %  Bandwidth value  (numeric value)
 BandwidthValue = uieditfield(LaserPanel,'numeric');
-
+WidthStart = CommandWidth - 12.8*TextFontSize ;
 HeightStart2 = HeightStart1 - 7*SpaceSize;
 WidthStart = WidthStart + 5*SpaceSize;
 
@@ -579,9 +587,9 @@ set(ROIHeightValue,'ValueChangedFcn',@(src,event) SetCameraROI(Camera,ROIWidthVa
 
 
 % Laser
-set(LaserOnOffButton,'ValueChangedFcn',@(src,event) LaserOnOff(Laser,LaserOnOffButton.Value));
+set(LaserOnOffButton,'ValueChangedFcn',@(src,event) LaserOnOff(Laser,Lamp, LaserOnOffButton.Value));
 set(PowerValue,'ValueChangedFcn',@(src,event) SetLaserPower(Laser, PowerValue.Value));
-set(WavelengthValue,'ValueChangedFcn',@(src,event) SetLaserWavelength(Laser, WavelengthValue.Value));
+set(WavelengthValue,'ValueChangedFcn',@(src,event) SetLaserWavelength(Laser, Lamp, WavelengthValue.Value));
 set(BandwidthValue,'ValueChangedFcn',@(src,event) SetLaserBandwidth(Laser, BandwidthValue.Value));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -653,12 +661,15 @@ end
 
 %%
 % Laser turn ON and turn OFF 
-function LaserOnOff(Laser, OnOffValue)
+function LaserOnOff(Laser, Lamp, OnOffValue)
     if (OnOffValue == 1)
         Laser.turnONdevice();
+        Laser.getRGBtriplet();
+        Lamp.Color  = [Laser.R  Laser.G  Laser.B];
     end
     if(OnOffValue == 0)
         Laser.turnOFFdevice();
+        Lamp.Color = [0 0 0]; % Turn off the Lamp
     end
 end
 
@@ -669,8 +680,9 @@ function SetLaserPower(Laser,powerLevel)
 end
 
 % Set the laser wavelength
-function SetLaserWavelength(Laser, lambda)
+function SetLaserWavelength(Laser, Lamp, lambda)
     Laser.setWavelength(lambda);
+    Lamp.Color  = [Laser.R  Laser.G  Laser.B];
 end
 
 
