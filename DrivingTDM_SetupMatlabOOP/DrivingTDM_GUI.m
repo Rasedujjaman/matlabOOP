@@ -276,15 +276,35 @@ LaserOnOffButton.Text = 'ON/OFF'; LaserOnOffButton.FontWeight = 'bold'; LaserOnO
 HeightStart1 = LaserPanelHeight-2*TextHeight - 2*SpaceSize;
 WidthStart = SpaceSize;
 LaserOnOffButton.Position=[WidthStart HeightStart1 4.5*TextFontSize TextHeight]; 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+LampPanel = uipanel(LaserPanel); 
+
+LampPanel.Units='pixels';
+LampPanelHeight =  1.2*TextHeight;
+LampPanelWidth = 1.2*TextHeight;
+LampPanelHeightStart = HeightStart1- 9*SpaceSize;
+LampPanelWidthtStart = WidthStart+5*SpaceSize;
+LampPanel.Position=[LampPanelWidthtStart  LampPanelHeightStart ...
+LampPanelWidth  LampPanelHeight];
+
+LampPanel.BorderType = 'line';
+LampPanel.BackgroundColor = [1 1 1];
 
 % Lamp (indicating the wavelength)
-Lamp = uilamp(LaserPanel);
-HeightStart3 = HeightStart1 -  8*SpaceSize;
-Lamp.Position = [WidthStart+5*SpaceSize  HeightStart3  2*TextFontSize TextHeight];
+Lamp = uilamp(LampPanel);
+LampWidth = 1.6*TextFontSize;
+LampHeight = 1.6*TextFontSize;
+newWidthStart = LampPanelWidth/2 - LampWidth/2; 
+newHeightStart =  LampPanelHeight/2 - LampHeight/2;
+Lamp.Position = [newWidthStart  newHeightStart  LampWidth  LampHeight];
 Lamp.Color = [0 0 0]; % The initial color is set to black
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Text Wavelength
-% 
 WavelengthLabel = uilabel(LaserPanel);
 WavelengthLabel.Text = 'Wavelength(nm)'; WavelengthLabel.FontWeight = 'bold'; WavelengthLabel.FontSize = TextFontSize;
 HeightStart1 = LaserPanelHeight-2*TextHeight - 2*SpaceSize;
@@ -663,11 +683,21 @@ end
 % Laser turn ON and turn OFF 
 function LaserOnOff(Laser, Lamp, OnOffValue)
     if (OnOffValue == 1)
+        if(isempty(Laser.portName))
+           disp('Check for the Laser source..')
+           disp('(1): Power switch is turned on');
+           disp('(2): Mechanical key switch is turned on');
+           disp('(3): Reset interlock button is pressed');
+           Laser.getRGBtriplet(0);
+           
+           return;
+        else
         Laser.turnONdevice();
         Laser.getRGBtriplet();
         Lamp.Color  = [Laser.R  Laser.G  Laser.B];
+        end
     end
-    if(OnOffValue == 0)
+    if(OnOffValue == 0 && (Laser.R ~= 0 || Laser.G ~= 0 || Laser.B ~= 0))
         Laser.turnOFFdevice();
         Lamp.Color = [0 0 0]; % Turn off the Lamp
     end

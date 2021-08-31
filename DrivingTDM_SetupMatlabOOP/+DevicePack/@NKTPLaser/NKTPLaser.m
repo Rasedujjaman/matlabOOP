@@ -70,7 +70,7 @@ classdef NKTPLaser < handle
     
     
     properties (Access = private)
-        portName;          %% The COM port where the module is conneced
+        
         powerLevel = 5;    %% present level of laser power(initial value is set to default) 
         bandWidth  = 10;   %% the present spectral bandwidth (initial value is set to default) 
         
@@ -78,6 +78,7 @@ classdef NKTPLaser < handle
     end
     
     properties (Access = public)
+        portName;          %% The COM port where the module is conneced
         isLaserON = 0;  %% This will indicates the status of the LASER
                         %%%  isLaserON = 0: Laser is in OFF state
                         %%%  isLaserON = 1: Laser is in ON state
